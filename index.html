@@ -2,341 +2,2769 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Classroom Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Classroom & Grievance Portal - Mech Sec D</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fonts: Inter & JetBrains Mono for IST Clock -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    :root {
-      color-scheme: light;
-      font-family: Arial, sans-serif;
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
     }
-
-    body {
-      margin: 0;
-      background: #f4f6fb;
-      color: #1c2430;
+    
+    .pulsing-dot {
+      animation: pulseGlow 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
-
-    header {
-      background: #2b4db9;
-      color: #fff;
-      padding: 1rem;
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(1.2); }
     }
-
-    main {
-      max-width: 960px;
-      margin: 1rem auto;
-      padding: 0 1rem 2rem;
-      display: grid;
-      gap: 1rem;
-    }
-
-    section {
-      background: #fff;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    h1, h2 {
-      margin: 0 0 0.75rem;
-    }
-
-    label {
-      font-weight: 600;
-    }
-
-    select, input, textarea, button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.55rem;
-      margin-top: 0.3rem;
-      margin-bottom: 0.8rem;
-      border: 1px solid #ccd3e0;
-      border-radius: 6px;
-      font: inherit;
-    }
-
-    button {
-      background: #2b4db9;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: #5d6474;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      border: 1px solid #d8deea;
-      text-align: left;
-      padding: 0.55rem;
-      vertical-align: top;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    li {
-      border: 1px solid #d8deea;
-      border-radius: 6px;
-      padding: 0.75rem;
-      margin-bottom: 0.65rem;
-      background: #fafbff;
-    }
-
-    .meta {
-      color: #4f5d79;
-      font-size: 0.9rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .role-note {
-      margin-top: -0.3rem;
-      margin-bottom: 0.9rem;
-      color: #425272;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .grid {
-      display: grid;
-      gap: 0.75rem;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
+    
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body>
-  <header>
-    <h1>Classroom Portal</h1>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white pb-12 sm:pb-6">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-3 right-3 sm:top-5 sm:right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-xs sm:max-w-sm w-full"></div>
+
+  <!-- Header Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-2 sm:space-x-3 truncate">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-brand-500/25 shrink-0">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div class="truncate">
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm sm:text-base font-black text-slate-800 tracking-tight truncate">Classroom Portal</span>
+            <span class="text-[9px] bg-brand-50 text-brand-700 px-1.5 py-0.2 rounded font-bold border border-brand-200 shrink-0">Mech Sec D</span>
+          </div>
+          <p class="text-[10px] text-slate-500 hidden sm:block truncate">Batch 2 • Core & Robotics/Automation</p>
+        </div>
+      </div>
+
+      <!-- Live Clock & User Area -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 bg-slate-100/90 px-2.5 py-1 rounded-xl border border-slate-200 text-[11px] font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 pulsing-dot"></span>
+          <span class="text-[9px] font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-100 px-1 py-0.2 rounded">IST</span>
+          <span id="headerClockTime" class="font-mono font-bold text-slate-800 text-xs">--:-- AM</span>
+        </div>
+
+        <div id="headerGuestIndicator" class="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span> Sign In
+        </div>
+
+        <div id="headerUserPanel" class="hidden items-center gap-2">
+          <div class="text-right hidden md:block">
+            <div id="headerUserName" class="text-xs font-bold text-slate-800 truncate max-w-[120px]">Student User</div>
+            <div id="headerUserRoleBadge" class="text-[9px] uppercase font-extrabold tracking-wider px-1.5 py-0.2 rounded inline-block bg-slate-100 text-slate-700 border border-slate-200">Student</div>
+          </div>
+          <button onclick="logoutUser()" class="p-2 sm:px-3 sm:py-1.5 text-xs font-bold bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 rounded-xl transition border border-slate-200 hover:border-rose-200 cursor-pointer shadow-2xs flex items-center gap-1">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Logout</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
   </header>
 
-  <main>
-    <section>
-      <h2>Access Role</h2>
-      <label for="role">Select your role</label>
-      <select id="role">
-        <option value="student">Student (View only)</option>
-        <option value="fa">Faculty Adviser (Edit access)</option>
-        <option value="cr">Class Representative (Edit access)</option>
-      </select>
-      <p id="roleNote" class="role-note">Students can only view timetable and updates.</p>
-    </section>
+  <!-- Class Cancellation Broadcast Banner -->
+  <div id="cancellationBroadcastBanner" class="hidden bg-rose-600 text-white shadow-md border-b-2 border-rose-700 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 flex-1 min-w-0">
+        <span class="shrink-0 bg-white text-rose-700 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded flex items-center gap-1">
+          <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+          <span>ALERT</span>
+        </span>
+        <span id="cancellationBannerText" class="font-bold truncate">Notice: Today's class is cancelled.</span>
+      </div>
+      <button onclick="dismissCancellationBanner()" class="text-white/80 hover:text-white text-[11px] font-bold px-2 py-0.5 bg-rose-700/60 rounded shrink-0">Dismiss</button>
+    </div>
+  </div>
 
-    <section>
-      <h2>Weekly Timetable</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Period 1</th>
-            <th>Period 2</th>
-            <th>Period 3</th>
-            <th>Period 4</th>
-          </tr>
-        </thead>
-        <tbody id="timetableBody"></tbody>
-      </table>
+  <!-- AUTHENTICATION SCREEN -->
+  <section id="loginScreen" class="flex-1 flex items-center justify-center p-3 sm:p-6">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-xl shadow-slate-200/80 p-5 sm:p-8 space-y-5">
+      
+      <div class="text-center space-y-1.5">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 border border-brand-100 shadow-xs mb-1">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black tracking-tight text-slate-800">Mech D Portal Access</h2>
+        <p class="text-xs text-slate-500">Dept. Mechanical Engg. - Section D (Batch 2)</p>
+      </div>
 
-      <form id="timetableForm" class="hidden" aria-label="Edit timetable">
-        <div class="grid">
+      <!-- Mode Switch Tabs -->
+      <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl border border-slate-200 text-xs font-bold">
+        <button id="btnAuthTabStudent" type="button" onclick="switchLoginMode('student')" class="py-2.5 rounded-xl bg-white text-brand-700 shadow-xs flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i>
+          <span>Student Access</span>
+        </button>
+        <button id="btnAuthTabStaff" type="button" onclick="switchLoginMode('staff')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+          <span>CR & FA Login</span>
+        </button>
+      </div>
+
+      <!-- 1. STUDENT LOGIN (3 DIGITS ONLY) -->
+      <div id="studentLoginFormWrap" class="space-y-4">
+        <div class="bg-brand-50/80 border border-brand-200 rounded-2xl p-3 text-xs text-brand-900 space-y-1">
+          <div class="font-black flex items-center gap-1.5 text-brand-800">
+            <i data-lucide="zap" class="w-4 h-4 text-brand-600"></i>
+            <span>Instant Student Access (Roll Number Only)</span>
+          </div>
+          <p class="text-slate-600 text-[11px] leading-relaxed">
+            Students enter the last 3 digits of your Register No. <strong>CRs must use the CR & FA Login tab</strong>[cite: 3].
+          </p>
+        </div>
+
+        <form onsubmit="handleStudentLogin(event)" class="space-y-4">
           <div>
-            <label for="day">Day</label>
-            <select id="day" required>
-              <option>Monday</option>
-              <option>Tuesday</option>
-              <option>Wednesday</option>
-              <option>Thursday</option>
-              <option>Friday</option>
+            <label for="studentRegInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 text-center">
+              Enter 3-Digit Roll / Reg No.
+            </label>
+            <div class="relative max-w-xs mx-auto">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 font-mono text-sm font-bold">RA2611...</span>
+              <input 
+                type="text" 
+                id="studentRegInput" 
+                maxlength="3" 
+                placeholder="202" 
+                autofocus
+                required 
+                class="w-full pl-24 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-brand-500 focus:outline-none text-xl font-mono font-black tracking-widest text-slate-800 text-center shadow-xs transition"
+              />
+            </div>
+            <p id="studentAuthError" class="text-[11px] text-rose-600 font-bold mt-2 text-center hidden"></p>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white text-sm font-extrabold rounded-2xl shadow-md shadow-brand-500/25 transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Enter as Student</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- 2. CR & FA STAFF LOGIN (GMAIL + PASS) -->
+      <div id="staffLoginFormWrap" class="hidden space-y-4">
+        <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 space-y-1">
+          <div class="font-black flex items-center gap-1.5 text-amber-800">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600"></i>
+            <span>Authorized Management Accounts (CR & FA)</span>
+          </div>
+          <p class="text-slate-600 text-[11px] leading-relaxed">
+            All 5 Class Representatives and Faculty Advisers log in here using Gmail and password[cite: 3].
+          </p>
+        </div>
+
+        <form onsubmit="handleStaffLogin(event)" class="space-y-3">
+          <div>
+            <label for="staffEmailInput" class="block text-xs font-bold text-slate-700 mb-1">Registered Gmail Address</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </span>
+              <input 
+                type="email" 
+                id="staffEmailInput" 
+                placeholder="arvind.cr@gmail.com" 
+                required 
+                class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs font-medium"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="staffPasswordInput" class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+              </span>
+              <input 
+                type="password" 
+                id="staffPasswordInput" 
+                placeholder="••••••••" 
+                required 
+                class="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs font-medium"
+              />
+              <button 
+                type="button" 
+                onclick="toggleStaffPasswordVisibility()" 
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                <i id="staffEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="staffLoginError" class="hidden p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-semibold flex items-center gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+            <span id="staffLoginErrorText">Invalid credentials entered.</span>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full py-3 px-4 bg-slate-900 hover:bg-black active:scale-[0.99] text-white text-sm font-extrabold rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Log In as CR / FA</span>
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+          <div class="font-bold text-slate-700">Quick Fill Accounts:</div>
+          <div class="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
+            <button type="button" onclick="fillStaffHelper('arvind.cr@gmail.com', 'cr009')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
+              <span class="font-bold text-slate-800">Arvind M R</span> (cr009)[cite: 3]
+            </button>
+            <button type="button" onclick="fillStaffHelper('akash.cr@gmail.com', 'cr005')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
+              <span class="font-bold text-slate-800">Akash Roy</span> (cr005)[cite: 3]
+            </button>
+            <button type="button" onclick="fillStaffHelper('abhijith.cr@gmail.com', 'cr238')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
+              <span class="font-bold text-slate-800">Abhijith V</span> (cr238)[cite: 3]
+            </button>
+            <button type="button" onclick="fillStaffHelper('muneer.cr@gmail.com', 'cr204')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
+              <span class="font-bold text-slate-800">M. Muneer</span> (cr204)[cite: 3]
+            </button>
+            <button type="button" onclick="fillStaffHelper('rushali.cr@gmail.com', 'cr210')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
+              <span class="font-bold text-slate-800">Rushali V</span> (cr210)[cite: 3]
+            </button>
+            <button type="button" onclick="fillStaffHelper('fa@gmail.com', 'fa123')" class="text-left bg-purple-50 p-1 rounded border border-purple-200 hover:bg-purple-100 truncate">
+              <span class="font-bold text-purple-900">Faculty Adviser</span> (fa123)
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DASHBOARD APPLICATION -->
+  <main id="dashboardApp" class="hidden flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 space-y-5 sm:space-y-6">
+
+    <!-- HERO PANEL -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-4 sm:p-7 shadow-xl border border-slate-800 relative overflow-hidden">
+      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center relative z-10">
+        
+        <div class="lg:col-span-6 space-y-2.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="userRoleBadge" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-brand-500/30 text-brand-300 border border-brand-400/40">
+              Student
+            </span>
+            <span id="userStreamText" class="text-xs text-slate-400 font-medium truncate">Dept. Mechanical Engg. - Sec D</span>
+          </div>
+
+          <h2 class="text-lg sm:text-2xl font-black tracking-tight leading-snug">
+            Welcome, <span id="dashBannerUserName" class="text-brand-300">Student</span>
+          </h2>
+
+          <div class="flex flex-wrap items-center gap-2 text-xs pt-1">
+            <div class="flex items-center gap-1.5 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/80">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-400"></i>
+              <span id="liveIstDate" class="font-mono font-bold text-slate-200 text-[11px] sm:text-xs">DD/MM/YYYY, Day</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/80">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span id="liveIstTime" class="font-mono font-extrabold text-emerald-400 text-xs sm:text-sm">--:--:-- AM IST</span>
+            </div>
+            
+            <!-- Global Day Order Control -->
+            <div class="flex items-center gap-1 bg-slate-800/90 px-2.5 py-1.5 rounded-xl border border-slate-700/80 text-xs">
+              <label for="activeDayOrderSelect" class="text-slate-400 font-bold text-[10px] sm:text-[11px]">Today's Day Order:</label>
+              <select id="activeDayOrderSelect" onchange="changeDayOrder(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg text-emerald-400 font-bold px-1.5 py-0.5 text-xs focus:outline-none transition disabled:opacity-80 disabled:cursor-not-allowed">
+                <option value="Day 1">Day 1</option>
+                <option value="Day 2">Day 2</option>
+                <option value="Day 3">Day 3</option>
+                <option value="Day 4">Day 4</option>
+                <option value="Day 5">Day 5</option>
+              </select>
+              <span id="dayOrderEditLockNote" class="text-[9px] text-slate-400"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div id="liveCurrentBox" class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/10 space-y-1 transition-all">
+            <div class="flex items-center justify-between">
+              <span id="liveCurrentStatusTitle" class="text-[10px] uppercase font-black tracking-wider text-brand-300 flex items-center gap-1.5">
+                <span id="liveCurrentDot" class="w-2 h-2 rounded-full bg-emerald-400 pulsing-dot"></span>
+                Ongoing Slot
+              </span>
+              <span id="liveSlotTiming" class="text-[10px] font-mono font-bold text-slate-300 bg-white/10 px-1.5 py-0.5 rounded">--:--</span>
+            </div>
+            <div id="liveCurrentPeriodName" class="text-sm sm:text-base font-black text-white truncate">Checking Schedule...</div>
+            <p id="liveCurrentPeriodMeta" class="text-[10px] sm:text-[11px] text-slate-300 truncate">Academic Slot Tracker</p>
+          </div>
+
+          <div id="liveNextBox" class="bg-white/5 backdrop-blur-md rounded-2xl p-3.5 border border-white/5 space-y-1 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-300 flex items-center gap-1">
+                <i data-lucide="fast-forward" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Next Class
+              </span>
+              <span id="liveNextSlotTiming" class="text-[10px] font-mono font-bold text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">--:--</span>
+            </div>
+            <div id="liveNextPeriodName" class="text-sm sm:text-base font-black text-slate-200 truncate">--</div>
+            <p id="liveNextPeriodMeta" class="text-[10px] sm:text-[11px] text-slate-400 truncate">Upcoming scheduled class</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TABS NAVIGATION BAR -->
+    <div class="flex border-b border-slate-200 gap-1.5 sm:gap-4 overflow-x-auto pb-px no-scrollbar text-xs sm:text-sm">
+      <button id="tabBtn-timetable" onclick="switchTab('timetableTab')" class="px-3 py-2.5 font-extrabold border-b-2 border-brand-600 text-brand-600 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="calendar-days" class="w-4 h-4"></i>
+        <span>Batch 2 Timetable</span>
+      </button>
+
+      <button id="tabBtn-courseDirectory" onclick="switchTab('courseDirectoryTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="map-pin" class="w-4 h-4"></i>
+        <span>Venues & Slots</span>
+      </button>
+
+      <!-- Student Management Tab: STRICTLY CR & FA ONLY -->
+      <button id="tabBtn-studentManage" onclick="switchTab('studentManageTab')" class="hidden px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+        <span>Student Management</span>
+        <span id="tabBadgeStudentCount" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-brand-100 text-brand-800 font-extrabold">0</span>
+      </button>
+
+      <button id="tabBtn-cancellations" onclick="switchTab('cancellationsTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+        <span>Cancellations</span>
+        <span id="tabBadgeCancellations" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-rose-100 text-rose-800 font-extrabold">0</span>
+      </button>
+
+      <button id="tabBtn-announcements" onclick="switchTab('announcementsTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="file-text" class="w-4 h-4"></i>
+        <span>Updates & Notes</span>
+        <span id="tabBadgeUpdates" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-slate-200 text-slate-700 font-extrabold">0</span>
+      </button>
+
+      <button id="tabBtn-grievance" onclick="switchTab('grievanceTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
+        <span>Grievance Desk</span>
+        <span id="tabBadgeGrievances" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-amber-100 text-amber-800 font-extrabold">0</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: BATCH 2 TIMETABLE -->
+    <div id="timetableTab" class="space-y-5">
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm sm:text-lg font-black text-slate-800 flex items-center gap-1.5">
+              <span>Official Batch 2 Master Schedule</span>
+              <span class="text-xs font-bold text-slate-400">(Day 1 - Day 5)</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">10 academic periods per Day Order[cite: 2]. <strong>Tap any period</strong> to open its faculty, room & venue popup.</p>
+          </div>
+          <div id="ttRoleActionBadge"></div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 -mx-1 sm:mx-0">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-extrabold">
+                <th class="py-2.5 px-2.5 sm:px-3">Hour/Day</th>
+                <th class="py-2.5 px-1.5 text-center">1<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">08:00</span></th>
+                <th class="py-2.5 px-1.5 text-center">2<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">08:50</span></th>
+                <th class="py-2.5 px-1.5 text-center">3<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">09:45</span></th>
+                <th class="py-2.5 px-1.5 text-center">4<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">10:40</span></th>
+                <th class="py-2.5 px-1.5 text-center">5<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">11:35</span></th>
+                <th class="py-2.5 px-1.5 text-center">6<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">12:30</span></th>
+                <th class="py-2.5 px-1.5 text-center">7<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">01:25</span></th>
+                <th class="py-2.5 px-1.5 text-center">8<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">02:20</span></th>
+                <th class="py-2.5 px-1.5 text-center">9<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">03:10</span></th>
+                <th class="py-2.5 px-1.5 text-center">10<br><span class="text-[8px] sm:text-[9px] font-normal text-slate-400">04:00</span></th>
+                <th id="thTimetableAction" class="py-2.5 px-2 text-right hidden">Edit</th>
+              </tr>
+            </thead>
+            <tbody id="timetableBodyRows" class="divide-y divide-slate-100 font-medium"></tbody>
+          </table>
+        </div>
+
+        <!-- Master Timetable Editor (CR & FA Staff only) -->
+        <div id="timetableEditorCard" class="hidden pt-4 border-t border-slate-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5 text-brand-600"></i>
+              <span>Batch 2 Day Order Editor (CR & FA Authority)</span>
+            </h4>
+            <span class="text-[10px] text-slate-400">Changes persist for all</span>
+          </div>
+
+          <form onsubmit="saveTimetableDay(event)" class="bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold text-slate-700">Day Order:</label>
+              <select id="editTTRowDay" onchange="loadDayScheduleInForm(this.value)" class="px-2.5 py-1.5 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <option value="Day 1">Day 1</option>
+                <option value="Day 2">Day 2</option>
+                <option value="Day 3">Day 3</option>
+                <option value="Day 4">Day 4</option>
+                <option value="Day 5">Day 5</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P1</label><input type="text" id="editSlot0" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P2</label><input type="text" id="editSlot1" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P3</label><input type="text" id="editSlot2" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P4</label><input type="text" id="editSlot3" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P5</label><input type="text" id="editSlot4" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P6</label><input type="text" id="editSlot5" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P7</label><input type="text" id="editSlot6" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P8</label><input type="text" id="editSlot7" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P9</label><input type="text" id="editSlot8" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+              <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">P10</label><input type="text" id="editSlot9" class="w-full p-1.5 bg-white rounded-lg border border-slate-300 text-xs font-mono" /></div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+              <button type="button" onclick="loadDayScheduleInForm(document.getElementById('editTTRowDay').value)" class="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl cursor-pointer">Reset</button>
+              <button type="submit" class="px-4 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs cursor-pointer flex items-center gap-1"><i data-lucide="save" class="w-3.5 h-3.5"></i><span>Save Schedule</span></button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: VENUES & LOCATION DIRECTORY -->
+    <div id="courseDirectoryTab" class="hidden space-y-5">
+      
+      <!-- Location Editor (CR & FA ONLY) -->
+      <div id="courseLocationEditorCard" class="hidden bg-white rounded-3xl border border-brand-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-4 h-4 text-brand-600"></i>
+              <span>Course Location, Venue & Slot Editor</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">Edit classrooms, buildings, slots, and faculty assignments.</p>
+          </div>
+          <span class="px-2 py-0.5 bg-brand-50 text-brand-700 text-[10px] font-extrabold rounded-lg border border-brand-200">CR & FA Authority</span>
+        </div>
+
+        <form onsubmit="handleSaveCourseLocation(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-brand-50/30 p-3 sm:p-4 rounded-2xl border border-brand-100">
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Course Code</label>
+            <select id="editCourseSelect" onchange="loadCourseDetailsIntoForm(this.value)" class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:outline-none"></select>
+          </div>
+          <div class="sm:col-span-5">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Course Name</label>
+            <input type="text" id="editCourseName" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Slot</label>
+            <input type="text" id="editCourseSlot" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-mono font-bold focus:outline-none" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Credit</label>
+            <input type="number" id="editCourseCredit" min="1" max="10" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:outline-none" />
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Assigned Faculty</label>
+            <input type="text" id="editCourseFaculty" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Building & Floor</label>
+            <input type="text" id="editCourseBuilding" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Room / Lab</label>
+            <input type="text" id="editCourseRoom" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-mono font-bold focus:outline-none" />
+          </div>
+
+          <div class="sm:col-span-12 flex justify-end pt-1">
+            <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i>
+              <span>Save Course & Venue</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Directory Table -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-800">Course Location & Slot Directory</h3>
+            <p class="text-[11px] text-slate-500">Instructor allocation, room locations, and credit structure.</p>
+          </div>
+          <span id="courseCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700">7 Courses</span>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 -mx-1 sm:mx-0">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+                <th class="py-2.5 px-3">Code</th>
+                <th class="py-2.5 px-3">Course Name</th>
+                <th class="py-2.5 px-2 text-center">Credit</th>
+                <th class="py-2.5 px-2 text-center">Slot</th>
+                <th class="py-2.5 px-3">Faculty</th>
+                <th class="py-2.5 px-3">Building & Floor</th>
+                <th class="py-2.5 px-3">Room / Lab</th>
+                <th id="thCourseActionCol" class="py-2.5 px-3 text-right hidden">Action</th>
+              </tr>
+            </thead>
+            <tbody id="courseDetailsTbody" class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: STUDENT MANAGEMENT (CR & FA RESTRICTED ONLY) -->
+    <div id="studentManageTab" class="hidden space-y-5">
+      
+      <div class="bg-white rounded-3xl border border-brand-200 p-4 sm:p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-2">
+              <i data-lucide="user-plus" class="w-4 h-4 text-brand-600"></i>
+              <span>Onboard New Student / Create Login</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">Authorized CRs and FA: Add new students to activate their 3-digit roll number login.</p>
+          </div>
+          <span class="px-2 py-0.5 bg-brand-50 text-brand-700 text-[10px] font-extrabold rounded-lg border border-brand-200">
+            CR / FA Exclusive
+          </span>
+        </div>
+
+        <form onsubmit="handleCreateNewStudent(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-brand-50/40 p-3 sm:p-4 rounded-2xl border border-brand-100">
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">3-Digit Roll Number *</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-mono text-xs font-bold">#</span>
+              <input 
+                type="text" 
+                id="newStudentRoll" 
+                maxlength="3" 
+                placeholder="257" 
+                required 
+                class="w-full pl-7 pr-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" 
+              />
+            </div>
+          </div>
+
+          <div class="sm:col-span-5">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Student Full Name *</label>
+            <input 
+              type="text" 
+              id="newStudentName" 
+              placeholder="e.g. S. HARISH KUMAR" 
+              required 
+              class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase" 
+            />
+          </div>
+
+          <div class="sm:col-span-4">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Branch / Stream *</label>
+            <select id="newStudentStream" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <option value="Core">Mechanical Core</option>
+              <option value="R&A">Robotics & Automation</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-12 flex justify-end pt-1">
+            <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+              <span>Register & Activate Student Login</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Student Directory List -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-800">Class Section D Roster</h3>
+            <p class="text-[11px] text-slate-500">Live roster of all registered students with portal access credentials.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input 
+              type="text" 
+              id="studentSearchInput" 
+              oninput="renderStudentManagementList()" 
+              placeholder="Search by name or roll..." 
+              class="px-2.5 py-1 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand-500" 
+            />
+            <span id="totalStudentsCountBadge" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-700 whitespace-nowrap">0 Students</span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 -mx-1 sm:mx-0">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+                <th class="py-2.5 px-3">Roll No.</th>
+                <th class="py-2.5 px-3">Student Name</th>
+                <th class="py-2.5 px-3">Stream</th>
+                <th class="py-2.5 px-3">Login Credentials</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentManagementTbody" class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 4: CLASS CANCELLATIONS & OVERRIDES -->
+    <div id="cancellationsTab" class="hidden space-y-5">
+      <div id="cancellationManagerCard" class="hidden bg-white rounded-3xl border border-rose-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 pulsing-dot"></span>
+              <span>Broadcast Class Cancellation / Override</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">Instantly mark a period as cancelled or substitute for all students.</p>
+          </div>
+          <span class="px-2 py-0.5 bg-rose-50 text-rose-700 text-[10px] font-extrabold rounded-lg border border-rose-200">Broadcast Control</span>
+        </div>
+
+        <form onsubmit="handleCreateClassOverride(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-rose-50/40 p-3 sm:p-4 rounded-2xl border border-rose-100">
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Target Day Order</label>
+            <select id="cancelDayInput" onchange="syncCancelSubjectPlaceholder()" class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:outline-none">
+              <option value="Day 1">Day 1</option>
+              <option value="Day 2">Day 2</option>
+              <option value="Day 3">Day 3</option>
+              <option value="Day 4">Day 4</option>
+              <option value="Day 5">Day 5</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Target Period</label>
+            <select id="cancelPeriodInput" onchange="syncCancelSubjectPlaceholder()" class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:outline-none">
+              <option value="0">Period 1 (08:00 - 08:50)</option>
+              <option value="1">Period 2 (08:50 - 09:40)</option>
+              <option value="2">Period 3 (09:45 - 10:35)</option>
+              <option value="3">Period 4 (10:40 - 11:30)</option>
+              <option value="4">Period 5 (11:35 - 12:25)</option>
+              <option value="5">Period 6 (12:30 - 01:20)</option>
+              <option value="6">Period 7 (01:25 - 02:15)</option>
+              <option value="7">Period 8 (02:20 - 03:10)</option>
+              <option value="8">Period 9 (03:10 - 04:00)</option>
+              <option value="9">Period 10 (04:00 - 04:50)</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Status Type</label>
+            <select id="cancelStatusType" class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:outline-none">
+              <option value="CANCELLED">🔴 CANCELLED / Free</option>
+              <option value="SUBSTITUTE">🟡 SUBSTITUTE / Shifted</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Substitute / Note</label>
+            <input type="text" id="cancelSubstituteSubject" placeholder="e.g. Library / Self Study" class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+          </div>
+
+          <div class="sm:col-span-9">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Broadcast Reason *</label>
+            <input type="text" id="cancelReasonInput" placeholder="e.g. Faculty attending symposium; free study hour." required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+          </div>
+
+          <div class="sm:col-span-3 flex items-end">
+            <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span>Broadcast</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <h3 class="text-sm sm:text-base font-black text-slate-800">Active Overrides & Cancellations</h3>
+          <span id="activeOverridesCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700">0 Active</span>
+        </div>
+        <div id="cancellationsList" class="space-y-2.5"></div>
+      </div>
+    </div>
+
+    <!-- TAB 5: SUBJECT UPDATES & NOTES UPLOADS -->
+    <div id="announcementsTab" class="hidden space-y-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div id="announcementPostCard" class="hidden lg:col-span-5 space-y-4">
+          <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3 sticky top-20">
+            <div>
+              <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-600"></i>
+                <span>Publish Notes & Updates</span>
+              </h3>
+              <p class="text-[11px] text-slate-500">Post study materials or announcements visible to all students.</p>
+            </div>
+
+            <form onsubmit="postNewAnnouncement(event)" class="space-y-2.5">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Subject / Course Code *</label>
+                <input type="text" id="annSubject" placeholder="e.g. 26MEE1002L" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:outline-none" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Teacher *</label>
+                  <input type="text" id="annTeacher" placeholder="Instructor name" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Category *</label>
+                  <select id="annCategory" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none">
+                    <option value="Notes">Study Notes & Lab</option>
+                    <option value="Exam">Exam / Assignment</option>
+                    <option value="Cancellation">Class Cancellation</option>
+                    <option value="Circular">Notice / Circular</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Message / Instructions *</label>
+                <textarea id="annContent" rows="3" placeholder="Provide syllabus, submission dates, or notes..." required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:outline-none resize-none"></textarea>
+              </div>
+
+              <div class="p-3 bg-slate-50 rounded-2xl border border-dashed border-slate-300 space-y-1.5">
+                <label class="block text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                  <span class="flex items-center gap-1.5"><i data-lucide="paperclip" class="w-3.5 h-3.5 text-slate-500"></i><span>Attach File</span></span>
+                  <span class="text-[9px] text-slate-400 font-normal">Optional</span>
+                </label>
+                <input type="file" id="annFileInput" accept=".pdf,.docx,.doc,.ppt,.pptx,.png,.jpg,.jpeg,.txt" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-brand-50 file:text-brand-700" />
+              </div>
+
+              <button type="submit" class="w-full py-2.5 text-xs font-extrabold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span>Publish Update & Document</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div id="announcementFeedCol" class="lg:col-span-12 space-y-3">
+          <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <div>
+                <h3 class="text-sm sm:text-base font-black text-slate-800">Section D Updates & Notes Feed</h3>
+                <p class="text-[11px] text-slate-500">Available to all students in real-time.</p>
+              </div>
+
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400"><i data-lucide="search" class="w-3.5 h-3.5"></i></span>
+                <input type="text" id="announcementSearch" oninput="renderAnnouncements()" placeholder="Search..." class="pl-8 pr-3 py-1 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+              <button onclick="setAnnouncementFilter('ALL')" id="filterChip-ALL" class="px-2.5 py-1 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap">All</button>
+              <button onclick="setAnnouncementFilter('Notes')" id="filterChip-Notes" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-medium whitespace-nowrap">Notes</button>
+              <button onclick="setAnnouncementFilter('Cancellation')" id="filterChip-Cancellation" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-medium whitespace-nowrap">Cancellations</button>
+              <button onclick="setAnnouncementFilter('Exam')" id="filterChip-Exam" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-medium whitespace-nowrap">Exams</button>
+              <button onclick="setAnnouncementFilter('Circular')" id="filterChip-Circular" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-medium whitespace-nowrap">Circulars</button>
+            </div>
+
+            <div id="announcementsList" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: GRIEVANCES DESK -->
+    <div id="grievanceTab" class="hidden space-y-5">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0"><i data-lucide="inbox" class="w-4 h-4"></i></div>
+          <div class="truncate"><div id="statTotalGrievances" class="text-base font-black text-slate-800">0</div><div class="text-[10px] text-slate-500">Registered</div></div>
+        </div>
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div>
+          <div class="truncate"><div id="statPendingGrievances" class="text-base font-black text-amber-700">0</div><div class="text-[10px] text-slate-500">Under Review</div></div>
+        </div>
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0"><i data-lucide="share-2" class="w-4 h-4"></i></div>
+          <div class="truncate"><div id="statForwardedGrievances" class="text-base font-black text-purple-700">0</div><div class="text-[10px] text-slate-500">With FA</div></div>
+        </div>
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+          <div class="truncate"><div id="statResolvedGrievances" class="text-base font-black text-emerald-700">0</div><div class="text-[10px] text-slate-500">Resolved</div></div>
+        </div>
+      </div>
+
+      <div id="studentGrievanceSubmitCard" class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-800">Lodge Grievance or Request</h3>
+            <p class="text-[11px] text-slate-500">Addressed to Section CRs and Faculty Adviser.</p>
+          </div>
+          <button onclick="toggleGrievanceForm()" id="btnToggleGrievanceForm" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold rounded-xl border border-brand-200 transition flex items-center gap-1 cursor-pointer">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Lodge</span>
+          </button>
+        </div>
+
+        <form id="grievanceForm" onsubmit="submitStudentGrievance(event)" class="hidden pt-3 border-t border-slate-100 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Issue Category *</label>
+              <select id="grvCategory" required class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none">
+                <option value="Academics">Academics & Coursework</option>
+                <option value="Facilities">Classroom & Lab Facilities</option>
+                <option value="Timetable">Timetable, Periods & Lab Clashes</option>
+                <option value="General">General / Peer Issues</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Severity *</label>
+              <select id="grvSeverity" required class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none">
+                <option value="Low">Low - Non-urgent</option>
+                <option value="Medium" selected>Medium - Normal classroom impact</option>
+                <option value="Urgent">Urgent - Immediate attention</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Issue Summary *</label>
+            <input type="text" id="grvTitle" placeholder="Short description of issue" required class="w-full p-2 bg-slate-50 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Detailed Description *</label>
+            <textarea id="grvDescription" rows="3" placeholder="Context, room number, or specifics..." required class="w-full p-2 bg-slate-50 rounded-xl border border-slate-300 text-xs focus:outline-none resize-none"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <label for="grvAnonymous" class="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" id="grvAnonymous" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500" />
+              <span class="text-xs font-bold text-slate-800">Submit Anonymously</span>
+            </label>
+            <span class="text-[11px] text-slate-400 flex items-center gap-1"><i data-lucide="shield" class="w-3.5 h-3.5 text-brand-600"></i><span>Privacy Guard</span></span>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-1">
+            <button type="button" onclick="toggleGrievanceForm()" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl cursor-pointer">Cancel</button>
+            <button type="submit" class="px-4 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>Submit</span></button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 class="text-sm sm:text-base font-black text-slate-800">Grievance Records</h3>
+          <input type="text" id="grvSearch" oninput="renderGrievanceList()" placeholder="Search..." class="px-2.5 py-1 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
+        </div>
+        <div id="grievanceCardsContainer" class="space-y-3"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- POPUP MODAL: PERIOD & COURSE DETAILS -->
+  <div id="courseInfoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-backdrop" onclick="if(event.target === this) closeCourseInfoModal()">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-3.5 border border-slate-200">
+      <div class="flex items-start justify-between border-b border-slate-100 pb-2.5">
+        <div>
+          <span id="popupSlotBadge" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-200 font-mono">Day • Period</span>
+          <h3 id="popupCourseName" class="text-sm sm:text-base font-bold text-slate-900 mt-1 leading-snug">Course Name</h3>
+          <span id="popupCourseCode" class="text-xs font-mono font-bold text-indigo-600">26MEE1002L</span>
+        </div>
+        <button onclick="closeCourseInfoModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+          <span class="text-slate-500 font-medium">Timing</span>
+          <span id="popupTiming" class="font-mono font-bold text-slate-800">--:-- AM - --:-- AM</span>
+        </div>
+        <div class="p-3 rounded-2xl bg-indigo-50/50 border border-indigo-100 space-y-0.5">
+          <span class="text-[9px] font-bold uppercase text-indigo-700 tracking-wider">Faculty</span>
+          <div id="popupFaculty" class="font-bold text-slate-800 text-xs sm:text-sm">Faculty Name</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+            <span class="text-[9px] font-bold uppercase text-slate-400">Venue</span>
+            <div id="popupRoom" class="font-mono font-black text-slate-800 text-xs sm:text-sm mt-0.5">Room 000</div>
+          </div>
+          <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+            <span class="text-[9px] font-bold uppercase text-slate-400">Credit & Slot</span>
+            <div id="popupCreditSlot" class="font-mono font-bold text-slate-800 text-xs sm:text-sm mt-0.5">-- Credits</div>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+          <span class="text-[9px] font-bold uppercase text-slate-400">Building</span>
+          <div id="popupBuilding" class="font-semibold text-slate-800 mt-0.5 text-xs">Building Location</div>
+        </div>
+      </div>
+
+      <div class="pt-1">
+        <button onclick="closeCourseInfoModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition cursor-pointer">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION MODAL: CR / FA -->
+  <div id="actionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-backdrop" onclick="if(event.target === this) closeActionModal()">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-3.5 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <span id="modalRoleBadge" class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-200">Action Panel</span>
+          <h3 id="modalGrievanceTitle" class="text-sm sm:text-base font-bold text-slate-800 mt-1">Grievance Title</h3>
+          <span id="modalGrievanceMeta" class="text-[11px] text-slate-500 font-mono">ID: GRV-101</span>
+        </div>
+        <button onclick="closeActionModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold cursor-pointer">&times;</button>
+      </div>
+
+      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+        <span class="font-bold text-slate-700">Student Issue Description:</span>
+        <p id="modalGrievanceDesc" class="text-slate-600 leading-relaxed"></p>
+      </div>
+
+      <form id="modalActionForm" onsubmit="handleModalActionSubmit(event)" class="space-y-3">
+        <input type="hidden" id="modalGrvId" />
+
+        <div id="crModalFields" class="space-y-2.5 hidden">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">CR Action Type</label>
+            <select id="modalCrActionType" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold">
+              <option value="forward_fa">Forward to Faculty Adviser (FA) with Endorsement</option>
+              <option value="cr_resolve">Resolve Directly (Classroom / Peer Level)</option>
+              <option value="under_review">Mark Under Review by CR</option>
             </select>
           </div>
           <div>
-            <label for="period1">Period 1</label>
-            <input id="period1" required />
-          </div>
-          <div>
-            <label for="period2">Period 2</label>
-            <input id="period2" required />
-          </div>
-          <div>
-            <label for="period3">Period 3</label>
-            <input id="period3" required />
-          </div>
-          <div>
-            <label for="period4">Period 4</label>
-            <input id="period4" required />
+            <label class="block text-xs font-bold text-slate-700 mb-1">CR Endorsement Note *</label>
+            <textarea id="modalCrNote" rows="3" required placeholder="Reason for escalation or resolution remarks..." class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none resize-none"></textarea>
           </div>
         </div>
-        <button type="submit">Save Day Timetable</button>
+
+        <div id="faModalFields" class="space-y-2.5 hidden">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Faculty Decision</label>
+            <select id="modalFaActionType" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold">
+              <option value="fa_resolve">Resolve Grievance (Official Faculty Resolution)</option>
+              <option value="fa_close">Close (Unfeasible / Dismissed)</option>
+              <option value="fa_review">Mark Under Investigation</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Official Faculty Order Remarks *</label>
+            <textarea id="modalFaNote" rows="3" required placeholder="Official order or resolution date..." class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none resize-none"></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" onclick="closeActionModal()" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition cursor-pointer">Submit Decision</button>
+        </div>
       </form>
-    </section>
-
-    <section>
-      <h2>Subject Teacher Updates</h2>
-      <ul id="updatesList"></ul>
-
-      <form id="updatesForm" class="hidden" aria-label="Post teacher update">
-        <label for="subject">Subject</label>
-        <input id="subject" required />
-
-        <label for="teacher">Teacher</label>
-        <input id="teacher" required />
-
-        <label for="message">Update</label>
-        <textarea id="message" rows="3" required></textarea>
-
-        <button type="submit">Post Update</button>
-      </form>
-    </section>
-  </main>
+    </div>
+  </div>
 
   <script>
-    const roleSelect = document.getElementById('role');
-    const roleNote = document.getElementById('roleNote');
-    const timetableForm = document.getElementById('timetableForm');
-    const updatesForm = document.getElementById('updatesForm');
-    const timetableBody = document.getElementById('timetableBody');
-    const updatesList = document.getElementById('updatesList');
-
-    const defaultTimetable = [
-      { day: 'Monday', periods: ['Math', 'Physics', 'Chemistry', 'English'] },
-      { day: 'Tuesday', periods: ['Biology', 'Math', 'History', 'Computer'] },
-      { day: 'Wednesday', periods: ['English', 'Chemistry', 'Math', 'Physics'] },
-      { day: 'Thursday', periods: ['Computer', 'Biology', 'English', 'Math'] },
-      { day: 'Friday', periods: ['Physics', 'History', 'Chemistry', 'Sports'] }
-    ];
-
-    const defaultUpdates = [
+    // --- 1. COURSE DETAILS & VENUE DIRECTORY ---
+    const DEFAULT_COURSE_DETAILS = [
       {
-        subject: 'Math',
-        teacher: 'Mr. Raman',
-        message: 'Unit test on Friday. Practice chapter 3 and 4.',
-        createdAt: new Date().toISOString()
+        id: 'c1',
+        code: '26MEE1002L',
+        name: 'ENGINEERING GRAPHICS',
+        credit: 2,
+        slot: 'P1,P2,P3,P4',
+        faculty: 'DR. BALAKRISHNAN P [ 102272 ]',
+        building: 'BASIC ENGINEERING LAB (BEL)',
+        floor: '3rd Floor',
+        room: 'BEL 401 Drafting Lab 1'
+      },
+      {
+        id: 'c2',
+        code: '26EEE1001T',
+        name: 'ELECTRICAL AND ELECTRONICS ENGINEERING',
+        credit: 3,
+        slot: 'C',
+        faculty: 'DR. ANURADHA C [ 100305 ]',
+        building: 'CRC BUILDING',
+        floor: '7th Floor',
+        room: 'CRC 807'
+      },
+      {
+        id: 'c3',
+        code: '26CSE1001T',
+        name: 'DATA SCIENCE AND ARTIFICIAL INTELLIGENCE',
+        credit: 3,
+        slot: 'E',
+        faculty: 'DR. SUNDAR SINGH SIVAM S P [ 101185 ]',
+        building: 'CRC BUILDING',
+        floor: '7th Floor',
+        room: 'CRC 807'
+      },
+      {
+        id: 'c4',
+        code: '26PYB1002J',
+        name: 'ELECTROMAGNETISM, QUANTUM PHYSICS AND OPTICS (LAB)',
+        credit: 4,
+        slot: 'P41,P42',
+        faculty: 'DR. ESWARA VARA PRASADARAO K [ 103522 ]',
+        building: 'UNIVERSITY BUILDING',
+        floor: '6th Floor',
+        room: '615 Physics Lab'
+      },
+      {
+        id: 'c5',
+        code: '26PYB1002J',
+        name: 'ELECTROMAGNETISM, QUANTUM PHYSICS AND OPTICS (THEORY)',
+        credit: 4,
+        slot: 'B',
+        faculty: 'DR. ARNAB GANGULY [ 103347 ]',
+        building: 'CRC BUILDING',
+        floor: '7th Floor',
+        room: 'CRC 807'
+      },
+      {
+        id: 'c6',
+        code: '26MAB1001T',
+        name: 'CALCULUS AND LINEAR ALGEBRA',
+        credit: 4,
+        slot: 'D',
+        faculty: 'DR. AMAL SHAJI [ 103997 ]',
+        building: 'CRC BUILDING',
+        floor: '7th Floor',
+        room: 'CRC 807'
+      },
+      {
+        id: 'c7',
+        code: '26LCA1001J',
+        name: 'PROFESSIONAL ENGLISH FOR ENGINEERS',
+        credit: 3,
+        slot: 'G',
+        faculty: 'DR. HORIZAN PRASANNA KUMAR S [ 100330 ]',
+        building: 'CRC BUILDING',
+        floor: '7th Floor',
+        room: 'CRC 807'
       }
     ];
 
-    function getStorage(key, fallback) {
-      const raw = localStorage.getItem(key);
-      if (!raw) return fallback;
+    // --- 2. OFFICIAL CLASS DATABASE: DEPT MECHANICAL ENGG SECTION D - BATCH 2 ---
+    const DEFAULT_CLASS_MEMBERS = [
+      { roll: '202', name: 'KAUSHTUBH SAH', stream: 'Core' },
+      { roll: '203', name: 'M DHARNESH BALA', stream: 'Core' },
+      { roll: '205', name: 'SHRI NIVAS S', stream: 'Core' },
+      { roll: '206', name: 'AYAN DEGHURIA', stream: 'Core' },
+      { roll: '207', name: 'JOEL MATEO COSTA', stream: 'Core' },
+      { roll: '208', name: 'KARANAM SHREYASH NAIDU', stream: 'Core' },
+      { roll: '209', name: 'VEDANT THIRUMAL', stream: 'Core' },
+      { roll: '211', name: 'AMRUDHEEN M', stream: 'Core' },
+      { roll: '212', name: 'KAILAASH N', stream: 'Core' },
+      { roll: '213', name: 'SR NAKSATRA', stream: 'Core' },
+      { roll: '214', name: 'ANIRUDH SUNDARARAJAN G', stream: 'Core' },
+      { roll: '215', name: 'NISHANT DUTTA', stream: 'Core' },
+      { roll: '216', name: 'ROHITH S', stream: 'Core' },
+      { roll: '217', name: 'MODHUPALLI EESHNA', stream: 'Core' },
+      { roll: '218', name: 'DANNANA MOHITH', stream: 'Core' },
+      { roll: '220', name: 'JASVANTH KILLI', stream: 'Core' },
+      { roll: '221', name: 'BARATH K R', stream: 'Core' },
+      { roll: '222', name: 'ADARSH S', stream: 'Core' },
+      { roll: '223', name: 'SAYYID SHAHZAD KK', stream: 'Core' },
+      { roll: '224', name: 'AKASH NANDHAN H', stream: 'Core' },
+      { roll: '225', name: 'MOHAMMAD IBRAHIM ALAM', stream: 'Core' },
+      { roll: '226', name: 'MUHAMMAD FARHAAN Z', stream: 'Core' },
+      { roll: '227', name: 'SHAUNAK M', stream: 'Core' },
+      { roll: '228', name: 'BASIM AHAMED Z', stream: 'Core' },
+      { roll: '229', name: 'NILIN PATIL', stream: 'Core' },
+      { roll: '230', name: 'JAY KAMAL PATEL', stream: 'Core' },
+      { roll: '231', name: 'BISWAPRATIM BOSE', stream: 'Core' },
+      { roll: '232', name: 'VIMAL ROSHAN P', stream: 'Core' },
+      { roll: '233', name: 'ASHMIT KUMAR CHOUDHARY', stream: 'Core' },
+      { roll: '234', name: 'SAMUEL AUSTINRAJ RAJKUMAR', stream: 'Core' },
+      { roll: '235', name: 'WASEEM HAMDAN', stream: 'Core' },
+      { roll: '236', name: 'VARSAAN PRAKASH S', stream: 'Core' },
+      { roll: '237', name: 'SHIVANSH PARAJULI', stream: 'Core' },
+      { roll: '239', name: 'SPARSH BIPIN MISTRY', stream: 'Core' },
+      { roll: '240', name: 'PAVAN YASHIN', stream: 'Core' },
+      { roll: '241', name: 'AADISH SOOD', stream: 'Core' },
+      { roll: '242', name: 'SUTARIA VANSH', stream: 'Core' },
+      { roll: '243', name: 'PANTHAGANI RAVI SRI TEJA', stream: 'Core' },
+      { roll: '244', name: 'GOVARTHAN M', stream: 'Core' },
+      { roll: '245', name: 'SHYAM SAGAR JEEJO', stream: 'Core' },
+      { roll: '246', name: 'AMRUTHA SUNIL', stream: 'Core' },
+      { roll: '247', name: 'DEBJIT KAR', stream: 'Core' },
+      { roll: '248', name: 'ARNOLD SEBASTIAN', stream: 'Core' },
+      { roll: '249', name: 'IRFAN SHAMEER', stream: 'Core' },
+      { roll: '250', name: 'GOLLA GANITH KRISHNA', stream: 'Core' },
+      { roll: '251', name: 'MUHAMMAD BASHIR ABB', stream: 'Core' },
+      { roll: '252', name: 'ADITHYAN SENTHIL PANDY', stream: 'Core' },
+      { roll: '253', name: 'KANISHQ KAUSHIK', stream: 'Core' },
+      { roll: '254', name: 'SHARVESH DHARUN G', stream: 'Core' },
+      { roll: '256', name: 'ANURON NAG', stream: 'Core' },
+      { roll: '001', name: 'NEMALIPURI MANI SAI', stream: 'R&A' },
+      { roll: '002', name: 'BALGURI SAI VIGNESH', stream: 'R&A' },
+      { roll: '003', name: 'MUDDAGOWNI YOGESH ABHIRAJ', stream: 'R&A' },
+      { roll: '004', name: 'SWAPNADEEP PAL', stream: 'R&A' },
+      { roll: '006', name: 'SAHITHYA GANTASALA', stream: 'R&A' },
+      { roll: '007', name: 'VALABOJU SOURISH', stream: 'R&A' },
+      { roll: '008', name: 'RITESH VAIBHAV PATIL', stream: 'R&A' },
+      { roll: '011', name: 'MUNAGALA YASHASWINI LOKESWARI', stream: 'R&A' },
+      { roll: '012', name: 'KARTHIKEYAN N', stream: 'R&A' },
+      { roll: '013', name: 'AADIT GANESH SHETTY', stream: 'R&A' },
+      { roll: '014', name: 'THEJUS MANOJ', stream: 'R&A' }
+    ];
+
+    const STAFF_ACCOUNTS = {
+      'abhijith.cr@gmail.com': {
+        email: 'abhijith.cr@gmail.com',
+        password: 'cr238',
+        name: 'Abhijith Variar (CR)',
+        regNo: 'RA2611002010238',
+        rollNo: '#238',
+        stream: 'Core',
+        role: 'cr',
+        roleLabel: 'Class Representative'
+      },
+      'akash.cr@gmail.com': {
+        email: 'akash.cr@gmail.com',
+        password: 'cr005',
+        name: 'Akash Roy (CR)',
+        regNo: 'RA2611072010005',
+        rollNo: '#005',
+        stream: 'R&A',
+        role: 'cr',
+        roleLabel: 'Class Representative'
+      },
+      'arvind.cr@gmail.com': {
+        email: 'arvind.cr@gmail.com',
+        password: 'cr009',
+        name: 'Arvind Naraynan M R (CR)',
+        regNo: 'RA2611072010009',
+        rollNo: '#009',
+        stream: 'R&A',
+        role: 'cr',
+        roleLabel: 'Class Representative'
+      },
+      'muneer.cr@gmail.com': {
+        email: 'muneer.cr@gmail.com',
+        password: 'cr204',
+        name: 'Mohammed Muneer (CR)',
+        regNo: 'RA2611002010204',
+        rollNo: '#204',
+        stream: 'Core',
+        role: 'cr',
+        roleLabel: 'Class Representative'
+      },
+      'rushali.cr@gmail.com': {
+        email: 'rushali.cr@gmail.com',
+        password: 'cr210',
+        name: 'Rushali Vardhan (CR)',
+        regNo: 'RA2611002010210',
+        rollNo: '#210',
+        stream: 'Core',
+        role: 'cr',
+        roleLabel: 'Class Representative'
+      },
+      'fa@gmail.com': {
+        email: 'fa@gmail.com',
+        password: 'fa123',
+        name: 'Dr. Faculty Adviser',
+        regNo: 'FAC-MECH-D',
+        rollNo: 'FA',
+        stream: 'Core & R&A',
+        role: 'fa',
+        roleLabel: 'Faculty Adviser'
+      }
+    };
+
+    const CR_ROLLS = ['238', '005', '009', '204', '210'];
+
+    // --- 3. BATCH 2 TIMETABLE ---
+    const DEFAULT_TIMETABLE = [
+      { 
+        day: 'Day 1', 
+        periods: ['26MEE1002L', '26MEE1002L', '26MEE1002L', '26MEE1002L', '-', '-', '-', '-', '-', '26LCA1001J'] 
+      },
+      { 
+        day: 'Day 2', 
+        periods: ['26PYB1002J', '26PYB1002J', '26LCA1001J', '26LCA1001J', '-', '-', '-', '-', '-', '-'] 
+      },
+      { 
+        day: 'Day 3', 
+        periods: ['-', '-', '-', '-', '-', '26EEE1001T', '26EEE1001T', '-', '26MAB1001T', '-'] 
+      },
+      { 
+        day: 'Day 4', 
+        periods: ['26MAB1001T', '26MAB1001T', '26PYB1002J', '26CSE1001T', '26LCA1001J', '-', '-', '-', '-', '-'] 
+      },
+      { 
+        day: 'Day 5', 
+        periods: ['26PYB1002J', '26PYB1002J', '-', '-', '-', '26CSE1001T', '26CSE1001T', '26EEE1001T', '-', '26MAB1001T'] 
+      }
+    ];
+
+    const PERIOD_SLOTS = [
+      { label: 'Period 1', start: 8 * 60, end: 8 * 60 + 50, timeStr: '08:00 AM - 08:50 AM', idx: 0 },
+      { label: 'Period 2', start: 8 * 60 + 50, end: 9 * 60 + 40, timeStr: '08:50 AM - 09:40 AM', idx: 1 },
+      { label: 'Short Break', start: 9 * 60 + 40, end: 9 * 60 + 45, timeStr: '09:40 AM - 09:45 AM', isBreak: true },
+      { label: 'Period 3', start: 9 * 60 + 45, end: 10 * 60 + 35, timeStr: '09:45 AM - 10:35 AM', idx: 2 },
+      { label: 'Short Break', start: 10 * 60 + 35, end: 10 * 60 + 40, timeStr: '10:35 AM - 10:40 AM', isBreak: true },
+      { label: 'Period 4', start: 10 * 60 + 40, end: 11 * 60 + 30, timeStr: '10:40 AM - 11:30 AM', idx: 3 },
+      { label: 'Short Break', start: 11 * 60 + 30, end: 11 * 60 + 35, timeStr: '11:30 AM - 11:35 AM', isBreak: true },
+      { label: 'Period 5', start: 11 * 60 + 35, end: 12 * 60 + 25, timeStr: '11:35 AM - 12:25 PM', idx: 4 },
+      { label: 'Lunch Break', start: 12 * 60 + 25, end: 12 * 60 + 30, timeStr: '12:25 PM - 12:30 PM', isLunch: true },
+      { label: 'Period 6', start: 12 * 60 + 30, end: 13 * 60 + 20, timeStr: '12:30 PM - 01:20 PM', idx: 5 },
+      { label: 'Short Break', start: 13 * 60 + 20, end: 13 * 60 + 25, timeStr: '01:20 PM - 01:25 PM', isBreak: true },
+      { label: 'Period 7', start: 13 * 60 + 25, end: 14 * 60 + 15, timeStr: '01:25 PM - 02:15 PM', idx: 6 },
+      { label: 'Short Break', start: 14 * 60 + 15, end: 14 * 60 + 20, timeStr: '02:15 PM - 02:20 PM', isBreak: true },
+      { label: 'Period 8', start: 14 * 60 + 20, end: 15 * 60 + 10, timeStr: '02:20 PM - 03:10 PM', idx: 7 },
+      { label: 'Period 9', start: 15 * 60 + 10, end: 16 * 60, timeStr: '03:10 PM - 04:00 PM', idx: 8 },
+      { label: 'Period 10', start: 16 * 60, end: 16 * 60 + 50, timeStr: '04:00 PM - 04:50 PM', idx: 9 }
+    ];
+
+    const DEFAULT_OVERRIDES = [];
+    const DEFAULT_ANNOUNCEMENTS = [
+      {
+        id: 'ann-1',
+        subject: '26MEE1002L',
+        teacher: 'DR. BALAKRISHNAN P',
+        category: 'Notes',
+        content: 'Engineering Graphics Drafting Lab 1 manual and basic sheet specifications uploaded.',
+        fileName: '26MEE1002L_Lab_Manual.pdf',
+        fileData: null,
+        postedBy: 'Arvind Naraynan M R (CR)',
+        postedAt: new Date(Date.now() - 3600000 * 3).toISOString()
+      }
+    ];
+
+    const DEFAULT_GRIEVANCES = [];
+
+    // Storage controllers (Versioned keys to prevent cache lock)
+    function loadStorage(key, fallback) {
       try {
-        return JSON.parse(raw);
-      } catch {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : fallback;
+      } catch (e) {
         return fallback;
       }
     }
 
-    function setStorage(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
+    function saveStorage(key, data) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        console.error("Storage error:", e);
+      }
     }
 
-    let timetable = getStorage('crp_timetable', defaultTimetable);
-    let updates = getStorage('crp_updates', defaultUpdates);
+    let currentUser = loadStorage('edup_mechd_user_v9', null);
+    let timetable = loadStorage('edup_mechd_timetable_v9', DEFAULT_TIMETABLE);
+    let courseDetails = loadStorage('edup_mechd_courses_v9', DEFAULT_COURSE_DETAILS);
+    let studentList = loadStorage('edup_mechd_students_v9', DEFAULT_CLASS_MEMBERS);
+    let classOverrides = loadStorage('edup_mechd_overrides_v9', DEFAULT_OVERRIDES);
+    let announcements = loadStorage('edup_mechd_announcements_v9', DEFAULT_ANNOUNCEMENTS);
+    let grievances = loadStorage('edup_mechd_grievances_v9', DEFAULT_GRIEVANCES);
+    let activeDayOrder = loadStorage('edup_mechd_global_day_v9', 'Day 5');
+    
+    let currentTab = 'timetableTab';
+    let currentAnnouncementFilter = 'ALL';
+    let isBannerDismissed = false;
 
-    function isEditor() {
-      return roleSelect.value === 'fa' || roleSelect.value === 'cr';
+    // Toast Notifications
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const theme = {
+        success: 'bg-emerald-600 text-white shadow-emerald-500/25',
+        error: 'bg-rose-600 text-white shadow-rose-500/25',
+        info: 'bg-slate-900 text-white shadow-slate-900/25',
+        warning: 'bg-amber-600 text-white shadow-amber-500/25'
+      };
+
+      toast.className = `${theme[type] || theme.info} pointer-events-auto p-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center justify-between gap-2 transform transition-all duration-300 translate-y-2 opacity-0 border border-white/10`;
+      toast.innerHTML = `
+        <div class="flex items-center gap-1.5 truncate"><span>${message}</span></div>
+        <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white text-base font-bold cursor-pointer shrink-0">&times;</button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 20);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 350);
+      }, 3500);
     }
 
-    function renderTimetable() {
-      timetableBody.innerHTML = '';
-      timetable.forEach((row) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${row.day}</td>
-          <td>${row.periods[0]}</td>
-          <td>${row.periods[1]}</td>
-          <td>${row.periods[2]}</td>
-          <td>${row.periods[3]}</td>
-        `;
-        timetableBody.appendChild(tr);
+    // Dynamic IST Clock and Lookahead Engine
+    function updateIndianStandardTime() {
+      const now = new Date();
+
+      const timeFormatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
       });
+
+      const dateFormatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        weekday: 'long',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+
+      const istTimeStr = timeFormatter.format(now);
+      const istDateStr = dateFormatter.format(now);
+
+      const headerClock = document.getElementById('headerClockTime');
+      if (headerClock) headerClock.textContent = istTimeStr;
+
+      const liveTimeEl = document.getElementById('liveIstTime');
+      if (liveTimeEl) liveTimeEl.textContent = `${istTimeStr} IST`;
+
+      const liveDateEl = document.getElementById('liveIstDate');
+      if (liveDateEl) liveDateEl.textContent = istDateStr;
+
+      const istHourFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', hour12: false });
+      const istMinFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', minute: 'numeric' });
+
+      const hours = parseInt(istHourFormatter.format(now), 10);
+      const minutes = parseInt(istMinFormatter.format(now), 10);
+      const currentMins = hours * 60 + minutes;
+
+      calculateOngoingClassStatus(activeDayOrder, currentMins);
+      checkTodayCancellationsForBanner(activeDayOrder);
     }
 
-    function renderUpdates() {
-      updatesList.innerHTML = '';
-      const sorted = [...updates].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      sorted.forEach((item, index) => {
-        const li = document.createElement('li');
-        const dateText = new Date(item.createdAt).toLocaleString();
-        li.innerHTML = `
-          <div class="meta"><strong>${item.subject}</strong> | ${item.teacher} | ${dateText}</div>
-          <div>${item.message}</div>
-        `;
+    // CR / FA Global Day Order Changer (Persists across the classroom)
+    function changeDayOrder(val) {
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) {
+        showToast('Only CRs or Faculty Advisers can change the Global Day Order.', 'warning');
+        document.getElementById('activeDayOrderSelect').value = activeDayOrder;
+        return;
+      }
+      activeDayOrder = val;
+      saveStorage('edup_mechd_global_day_v9', activeDayOrder);
+      updateIndianStandardTime();
+      showToast(`Global Day Order updated to ${activeDayOrder} by ${currentUser.name}`, 'success');
+    }
 
-        if (isEditor()) {
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = 'Delete';
-          deleteBtn.className = 'secondary';
-          deleteBtn.addEventListener('click', () => {
-            const target = sorted[index];
-            updates = updates.filter((u) => !(u.subject === target.subject && u.teacher === target.teacher && u.message === target.message && u.createdAt === target.createdAt));
-            setStorage('crp_updates', updates);
-            renderUpdates();
-          });
-          li.appendChild(deleteBtn);
+    function getOverrideForSlot(day, periodIndex) {
+      return classOverrides.find(ovr => ovr.day === day && ovr.periodIdx === periodIndex);
+    }
+
+    function getCourseInfo(code) {
+      if (!code) return null;
+      return courseDetails.find(c => c.code === code.trim()) || null;
+    }
+
+    function calculateOngoingClassStatus(dayName, currentMins) {
+      const liveCurrentBox = document.getElementById('liveCurrentBox');
+      const liveName = document.getElementById('liveCurrentPeriodName');
+      const liveMeta = document.getElementById('liveCurrentPeriodMeta');
+      const liveTiming = document.getElementById('liveSlotTiming');
+      const liveStatusTitle = document.getElementById('liveCurrentStatusTitle');
+
+      const nextName = document.getElementById('liveNextPeriodName');
+      const nextMeta = document.getElementById('liveNextPeriodMeta');
+      const nextTiming = document.getElementById('liveNextSlotTiming');
+
+      if (!liveName) return;
+
+      const todaySchedule = timetable.find(t => t.day === dayName);
+      if (!todaySchedule) return;
+
+      function findNextActualClass(afterIndex) {
+        for (let i = afterIndex + 1; i < PERIOD_SLOTS.length; i++) {
+          const slot = PERIOD_SLOTS[i];
+          if (slot.isBreak || slot.isLunch) continue;
+
+          const override = getOverrideForSlot(dayName, slot.idx);
+          if (override && override.statusType === 'CANCELLED') continue;
+
+          const rawSub = override && override.statusType === 'SUBSTITUTE' 
+            ? override.substituteSubject 
+            : todaySchedule.periods[slot.idx];
+
+          if (rawSub && rawSub.trim() !== '' && rawSub !== '-') {
+            const info = getCourseInfo(rawSub);
+            return {
+              slot,
+              subject: rawSub,
+              courseName: info ? info.name : '',
+              room: info ? info.room : 'Batch 2',
+              isSubstitute: override && override.statusType === 'SUBSTITUTE'
+            };
+          }
+        }
+        return null;
+      }
+
+      if (currentMins < 8 * 60) {
+        liveName.textContent = 'Pre-Class Morning Hours';
+        liveMeta.textContent = `${dayName} • Classes commence at 08:00 AM`;
+        liveTiming.textContent = 'Starts 08:00 AM';
+        liveStatusTitle.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 pulsing-dot"></span> Pending Start`;
+
+        const firstClass = findNextActualClass(-1);
+        if (firstClass) {
+          nextName.textContent = `${firstClass.slot.label}: ${firstClass.subject}`;
+          nextMeta.textContent = `${firstClass.room} • Starts ${firstClass.slot.timeStr.split(' - ')[0]}`;
+          nextTiming.textContent = firstClass.slot.timeStr.split(' - ')[0];
+        } else {
+          nextName.textContent = 'No classes scheduled today';
+          nextMeta.textContent = 'Free Day';
+          nextTiming.textContent = '--';
+        }
+        return;
+      }
+
+      if (currentMins >= 16 * 60 + 50) {
+        liveName.textContent = 'College Hours Concluded';
+        liveMeta.textContent = 'All 10 periods completed for today';
+        liveTiming.textContent = 'Ended 04:50 PM';
+        liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Day Ended`;
+
+        nextName.textContent = 'Classes done for today';
+        nextMeta.textContent = 'Check next Day Order';
+        nextTiming.textContent = '08:00 AM';
+        return;
+      }
+
+      let currentSlotIndex = -1;
+      for (let i = 0; i < PERIOD_SLOTS.length; i++) {
+        const slot = PERIOD_SLOTS[i];
+        if (currentMins >= slot.start && currentMins < slot.end) {
+          currentSlotIndex = i;
+          break;
+        }
+      }
+
+      if (currentSlotIndex !== -1) {
+        const currentSlot = PERIOD_SLOTS[currentSlotIndex];
+        liveTiming.textContent = currentSlot.timeStr;
+
+        if (currentSlot.isBreak || currentSlot.isLunch) {
+          liveName.textContent = currentSlot.isLunch ? '🍱 Lunch Break' : '☕ Short Recess';
+          liveMeta.textContent = `${dayName} • Interval`;
+          liveCurrentBox.className = "bg-amber-900/30 backdrop-blur-md rounded-2xl p-3.5 border border-amber-500/30 space-y-1";
+          liveCurrentBox.onclick = null;
+          liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400 pulsing-dot"></span> Recess`;
+        } else {
+          const override = getOverrideForSlot(dayName, currentSlot.idx);
+          const rawSubject = todaySchedule.periods[currentSlot.idx];
+          const isSlotEmpty = !rawSubject || rawSubject.trim() === '' || rawSubject === '-';
+
+          if (override && override.statusType === 'CANCELLED') {
+            liveName.textContent = `🚨 ${currentSlot.label} CANCELLED`;
+            liveMeta.textContent = `Reason: ${override.reason} (Free Period)`;
+            liveCurrentBox.className = "bg-rose-900/40 backdrop-blur-md rounded-2xl p-3.5 border border-rose-500/50 space-y-1 animate-pulse";
+            liveCurrentBox.onclick = null;
+            liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-rose-500 pulsing-dot"></span> CLASS CANCELLED`;
+          } else if (override && override.statusType === 'SUBSTITUTE') {
+            liveName.textContent = `🔄 ${currentSlot.label}: ${override.substituteSubject}`;
+            liveMeta.textContent = `Notice: ${override.reason}`;
+            liveCurrentBox.className = "bg-amber-900/40 backdrop-blur-md rounded-2xl p-3.5 border border-amber-500/50 space-y-1";
+            liveCurrentBox.onclick = null;
+            liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400 pulsing-dot"></span> SUBSTITUTE CLASS`;
+          } else if (isSlotEmpty) {
+            liveName.textContent = `${currentSlot.label}: Free Period`;
+            liveMeta.textContent = `${dayName} • No Lecture Scheduled`;
+            liveCurrentBox.className = "bg-slate-800/80 backdrop-blur-md rounded-2xl p-3.5 border border-slate-700/60 space-y-1";
+            liveCurrentBox.onclick = null;
+            liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Free Period`;
+          } else {
+            const info = getCourseInfo(rawSubject);
+            liveName.textContent = `${currentSlot.label}: ${rawSubject}`;
+            liveMeta.textContent = info ? `${info.room} • ${info.name}` : `${dayName} • Batch 2`;
+            liveCurrentBox.className = "bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/10 space-y-1 cursor-pointer hover:bg-white/15 transition";
+            liveCurrentBox.onclick = () => openCourseInfoModal(dayName, currentSlot.idx, rawSubject);
+            liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulsing-dot"></span> Ongoing Class (Tap Info)`;
+          }
         }
 
-        updatesList.appendChild(li);
+        const nextActual = findNextActualClass(currentSlotIndex);
+        if (nextActual) {
+          nextName.textContent = `${nextActual.slot.label}: ${nextActual.subject}${nextActual.isSubstitute ? ' (Sub)' : ''}`;
+          nextMeta.textContent = `${nextActual.room} • Starts at ${nextActual.slot.timeStr.split(' - ')[0]} IST`;
+          nextTiming.textContent = nextActual.slot.timeStr.split(' - ')[0];
+        } else {
+          nextName.textContent = 'No more classes scheduled today';
+          nextMeta.textContent = 'Remaining slots are Free Periods';
+          nextTiming.textContent = 'Dispersal';
+        }
+      }
+    }
+
+    function checkTodayCancellationsForBanner(dayName) {
+      const banner = document.getElementById('cancellationBroadcastBanner');
+      const bannerText = document.getElementById('cancellationBannerText');
+      if (!banner || !bannerText || isBannerDismissed) return;
+
+      const todayOverrides = classOverrides.filter(ovr => ovr.day === dayName);
+      if (todayOverrides.length > 0) {
+        const primary = todayOverrides[0];
+        const pSlot = PERIOD_SLOTS.find(p => p.idx === primary.periodIdx);
+        const pLabel = pSlot ? pSlot.label : `Period ${primary.periodIdx + 1}`;
+        
+        bannerText.textContent = `ALERT: ${dayName} ${pLabel} (${primary.originalSubject}) is marked as ${primary.statusType}! Reason: ${primary.reason}`;
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function dismissCancellationBanner() {
+      isBannerDismissed = true;
+      document.getElementById('cancellationBroadcastBanner').classList.add('hidden');
+    }
+
+    // Modal Popup for Slots
+    function openCourseInfoModal(day, periodIdx, courseCode) {
+      const modal = document.getElementById('courseInfoModal');
+      const info = getCourseInfo(courseCode);
+      const slotData = PERIOD_SLOTS.find(p => p.idx === periodIdx);
+
+      document.getElementById('popupSlotBadge').textContent = `${day} • ${slotData ? slotData.label : `Period ${periodIdx + 1}`}`;
+      document.getElementById('popupTiming').textContent = slotData ? slotData.timeStr : '--:--';
+      document.getElementById('popupCourseCode').textContent = courseCode;
+
+      if (info) {
+        document.getElementById('popupCourseName').textContent = info.name;
+        document.getElementById('popupFaculty').textContent = info.faculty;
+        document.getElementById('popupRoom').textContent = info.room;
+        document.getElementById('popupCreditSlot').textContent = `${info.credit} Credits (Slot ${info.slot})`;
+        document.getElementById('popupBuilding').textContent = `${info.building} (${info.floor})`;
+      } else {
+        document.getElementById('popupCourseName').textContent = courseCode;
+        document.getElementById('popupFaculty').textContent = 'Department Faculty';
+        document.getElementById('popupRoom').textContent = 'Batch 2 Room';
+        document.getElementById('popupCreditSlot').textContent = 'Regular Slot';
+        document.getElementById('popupBuilding').textContent = 'Mechanical Engineering Dept.';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeCourseInfoModal() {
+      const modal = document.getElementById('courseInfoModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Auth Handlers
+    function switchLoginMode(mode) {
+      const btnStudent = document.getElementById('btnAuthTabStudent');
+      const btnStaff = document.getElementById('btnAuthTabStaff');
+      const studentWrap = document.getElementById('studentLoginFormWrap');
+      const staffWrap = document.getElementById('staffLoginFormWrap');
+      document.getElementById('studentAuthError').classList.add('hidden');
+      document.getElementById('staffLoginError').classList.add('hidden');
+
+      if (mode === 'student') {
+        btnStudent.className = "py-2.5 rounded-xl bg-white text-brand-700 shadow-xs flex items-center justify-center gap-1.5 transition";
+        btnStaff.className = "py-2.5 rounded-xl text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition";
+        studentWrap.classList.remove('hidden');
+        staffWrap.classList.add('hidden');
+        document.getElementById('studentRegInput').focus();
+      } else {
+        btnStaff.className = "py-2.5 rounded-xl bg-white text-slate-900 shadow-xs flex items-center justify-center gap-1.5 transition";
+        btnStudent.className = "py-2.5 rounded-xl text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition";
+        staffWrap.classList.remove('hidden');
+        studentWrap.classList.add('hidden');
+        document.getElementById('staffEmailInput').focus();
+      }
+      lucide.createIcons();
+    }
+
+    function handleStudentLogin(e) {
+      e.preventDefault();
+      const rawInput = document.getElementById('studentRegInput').value.trim();
+      const errEl = document.getElementById('studentAuthError');
+      errEl.classList.add('hidden');
+
+      if (!rawInput) return;
+
+      const rollNum = rawInput.padStart(3, '0').slice(-3);
+
+      if (CR_ROLLS.includes(rollNum)) {
+        errEl.textContent = `Roll #${rollNum} is registered as a Class Representative. Please sign in via the 'CR & FA Login' tab above using your Gmail credentials.`;
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      // Check student list including newly registered students
+      const match = studentList.find(m => m.roll === rollNum);
+
+      if (!match) {
+        errEl.textContent = 'Roll number not found in Section D records. Contact your Class Representative to register your profile.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      currentUser = {
+        email: `student${rollNum}@portal.edu`,
+        name: match.name,
+        rollNo: `#${match.roll}`,
+        stream: match.stream,
+        role: 'student',
+        roleLabel: 'Student'
+      };
+
+      saveStorage('edup_mechd_user_v9', currentUser);
+      showToast(`Welcome ${match.name} (${match.stream})`, 'success');
+      refreshAppState();
+    }
+
+    function handleStaffLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
+      const pwd = document.getElementById('staffPasswordInput').value.trim();
+      const errBox = document.getElementById('staffLoginError');
+      const errText = document.getElementById('staffLoginErrorText');
+
+      errBox.classList.add('hidden');
+
+      const staffAccount = STAFF_ACCOUNTS[email];
+      if (staffAccount && staffAccount.password === pwd) {
+        currentUser = { ...staffAccount, loggedInAt: new Date().toISOString() };
+        saveStorage('edup_mechd_user_v9', currentUser);
+        showToast(`Signed in: ${currentUser.name}`, 'success');
+        refreshAppState();
+      } else {
+        errText.textContent = 'Invalid Gmail or password entered.';
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    function fillStaffHelper(email, pwd) {
+      document.getElementById('staffEmailInput').value = email;
+      document.getElementById('staffPasswordInput').value = pwd;
+    }
+
+    function toggleStaffPasswordVisibility() {
+      const pwd = document.getElementById('staffPasswordInput');
+      pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem('edup_mechd_user_v9');
+      showToast('Successfully logged out.', 'info');
+      refreshAppState();
+    }
+
+    function switchTab(tabId) {
+      // Security check: restrict students from opening Student Management tab directly
+      if (tabId === 'studentManageTab') {
+        const isStaff = currentUser && (currentUser.role === 'cr' || currentUser.role === 'fa');
+        if (!isStaff) {
+          showToast('Access restricted: Only CRs and Faculty Advisers can access Student Management.', 'error');
+          return;
+        }
+      }
+
+      currentTab = tabId;
+      ['timetableTab', 'courseDirectoryTab', 'studentManageTab', 'cancellationsTab', 'announcementsTab', 'grievanceTab'].forEach((id) => {
+        const el = document.getElementById(id);
+        const btn = document.getElementById(`tabBtn-${id.replace('Tab', '')}`);
+        if (!el || !btn) return;
+        if (id === tabId) {
+          el.classList.remove('hidden');
+          btn.className = "px-3 py-2.5 font-extrabold border-b-2 border-brand-600 text-brand-600 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0";
+        } else {
+          el.classList.add('hidden');
+          btn.className = "px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0";
+        }
+      });
+
+      if (tabId === 'timetableTab') renderTimetable();
+      if (tabId === 'courseDirectoryTab') renderCourseDirectory();
+      if (tabId === 'studentManageTab') renderStudentManagementList();
+      if (tabId === 'cancellationsTab') renderCancellations();
+      if (tabId === 'announcementsTab') renderAnnouncements();
+      if (tabId === 'grievanceTab') renderGrievanceList();
+      lucide.createIcons();
+    }
+
+    function refreshAppState() {
+      const loginScreen = document.getElementById('loginScreen');
+      const dashboardApp = document.getElementById('dashboardApp');
+      const headerGuestIndicator = document.getElementById('headerGuestIndicator');
+      const headerUserPanel = document.getElementById('headerUserPanel');
+
+      if (!currentUser) {
+        loginScreen.classList.remove('hidden');
+        dashboardApp.classList.add('hidden');
+        headerGuestIndicator.classList.remove('hidden');
+        headerUserPanel.classList.add('hidden');
+        document.getElementById('cancellationBroadcastBanner').classList.add('hidden');
+        lucide.createIcons();
+        return;
+      }
+
+      loginScreen.classList.add('hidden');
+      dashboardApp.classList.remove('hidden');
+      headerGuestIndicator.classList.add('hidden');
+      headerUserPanel.classList.remove('hidden');
+      headerUserPanel.classList.add('flex');
+
+      document.getElementById('headerUserName').textContent = currentUser.name;
+      document.getElementById('headerUserRoleBadge').textContent = `${currentUser.role.toUpperCase()} (${currentUser.rollNo})`;
+      document.getElementById('dashBannerUserName').textContent = currentUser.name;
+
+      const isStaff = currentUser.role === 'cr' || currentUser.role === 'fa';
+      const roleBadge = document.getElementById('userRoleBadge');
+      const streamText = document.getElementById('userStreamText');
+
+      streamText.textContent = `Mechanical Engg. Sec D • ${currentUser.stream || 'Batch 2'}`;
+
+      const studentManageBtn = document.getElementById('tabBtn-studentManage');
+      const studentManageSection = document.getElementById('studentManageTab');
+
+      if (currentUser.role === 'student') {
+        roleBadge.textContent = `Student Desk (${currentUser.rollNo})`;
+        roleBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-blue-500/30 text-blue-300 border border-blue-400/40";
+        document.getElementById('studentGrievanceSubmitCard').classList.remove('hidden');
+        
+        // Ensure student management tab and view are completely hidden from students
+        studentManageBtn.classList.add('hidden');
+        studentManageBtn.classList.remove('flex');
+        studentManageSection.classList.add('hidden');
+        if (currentTab === 'studentManageTab') {
+          currentTab = 'timetableTab';
+        }
+      } else if (currentUser.role === 'cr') {
+        roleBadge.textContent = `Class Representative (CR Authority) • ${currentUser.stream}`;
+        roleBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-emerald-500/30 text-emerald-300 border border-emerald-400/40";
+        document.getElementById('studentGrievanceSubmitCard').classList.remove('hidden');
+        studentManageBtn.classList.remove('hidden');
+        studentManageBtn.classList.add('flex');
+      } else if (currentUser.role === 'fa') {
+        roleBadge.textContent = "Faculty Adviser (FA Authority)";
+        roleBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-purple-500/30 text-purple-300 border border-purple-400/40";
+        document.getElementById('studentGrievanceSubmitCard').classList.add('hidden');
+        studentManageBtn.classList.remove('hidden');
+        studentManageBtn.classList.add('flex');
+      }
+
+      // Permissions UI Visibility
+      document.getElementById('cancellationManagerCard').classList.toggle('hidden', !isStaff);
+      document.getElementById('timetableEditorCard').classList.toggle('hidden', !isStaff);
+      document.getElementById('thTimetableAction').classList.toggle('hidden', !isStaff);
+      document.getElementById('courseLocationEditorCard').classList.toggle('hidden', !isStaff);
+      document.getElementById('thCourseActionCol').classList.toggle('hidden', !isStaff);
+      document.getElementById('announcementPostCard').classList.toggle('hidden', !isStaff);
+
+      // Lock/Unlock the Global Day Order dropdown depending on authorization
+      const dayOrderSelect = document.getElementById('activeDayOrderSelect');
+      const dayOrderNote = document.getElementById('dayOrderEditLockNote');
+      dayOrderSelect.disabled = !isStaff;
+      dayOrderNote.textContent = isStaff ? '(CR/FA Edit)' : '(Syncing)';
+
+      const feedCol = document.getElementById('announcementFeedCol');
+      feedCol.className = isStaff ? "lg:col-span-7 space-y-3" : "lg:col-span-12 space-y-3";
+
+      const ttNotice = document.getElementById('ttRoleActionBadge');
+      if (isStaff) {
+        ttNotice.innerHTML = `<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-lg border border-emerald-200 flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> CR/FA Controls</span>`;
+      } else {
+        ttNotice.innerHTML = `<span class="text-[10px] text-slate-400 font-medium">Read-only schedule</span>`;
+      }
+
+      dayOrderSelect.value = activeDayOrder;
+      document.getElementById('tabBadgeCancellations').textContent = classOverrides.length;
+      document.getElementById('tabBadgeUpdates').textContent = announcements.length;
+      document.getElementById('tabBadgeGrievances').textContent = grievances.length;
+      document.getElementById('tabBadgeStudentCount').textContent = studentList.length;
+
+      populateCourseSelectOptions();
+      switchTab(currentTab);
+      updateIndianStandardTime();
+      lucide.createIcons();
+    }
+
+    // --- 9. NEW STUDENT ONBOARDING & MANAGEMENT (CR & FA ONLY) ---
+    function handleCreateNewStudent(e) {
+      e.preventDefault();
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) {
+        showToast('Unauthorized: Only CRs and Faculty Advisers can onboard students.', 'error');
+        return;
+      }
+
+      const rawRoll = document.getElementById('newStudentRoll').value.trim();
+      const roll = rawRoll.padStart(3, '0').slice(-3);
+      const name = document.getElementById('newStudentName').value.trim().toUpperCase();
+      const stream = document.getElementById('newStudentStream').value;
+
+      if (CR_ROLLS.includes(roll)) {
+        showToast(`Roll #${roll} is a reserved Class Representative roll number.`, 'error');
+        return;
+      }
+
+      if (studentList.some(s => s.roll === roll)) {
+        showToast(`Student with Roll #${roll} already exists in Section D records.`, 'warning');
+        return;
+      }
+
+      const newStudent = { roll, name, stream };
+      studentList.unshift(newStudent);
+      saveStorage('edup_mechd_students_v9', studentList);
+
+      const welcomeNotice = {
+        id: 'ann-' + Date.now(),
+        subject: 'Student Admissions / Roll Update',
+        teacher: `${currentUser.name} (${currentUser.role.toUpperCase()})`,
+        category: 'Circular',
+        content: `New Student Profile Activated: ${name} (Roll #${roll}, ${stream} Stream). Welcome to Mechanical Engineering Section D!`,
+        fileName: null,
+        fileData: null,
+        postedBy: currentUser.name,
+        postedAt: new Date().toISOString()
+      };
+      announcements.unshift(welcomeNotice);
+      saveStorage('edup_mechd_announcements_v9', announcements);
+
+      document.getElementById('newStudentRoll').value = '';
+      document.getElementById('newStudentName').value = '';
+
+      document.getElementById('tabBadgeStudentCount').textContent = studentList.length;
+      document.getElementById('tabBadgeUpdates').textContent = announcements.length;
+
+      renderStudentManagementList();
+      renderAnnouncements();
+      showToast(`Student #${roll} (${name}) registered successfully! Login is active.`, 'success');
+    }
+
+    function removeStudent(roll) {
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) {
+        showToast('Unauthorized action.', 'error');
+        return;
+      }
+      if (!confirm(`Are you sure you want to revoke login access for Student #${roll}?`)) return;
+
+      studentList = studentList.filter(s => s.roll !== roll);
+      saveStorage('edup_mechd_students_v9', studentList);
+      document.getElementById('tabBadgeStudentCount').textContent = studentList.length;
+      renderStudentManagementList();
+      showToast(`Access revoked for Student #${roll}.`, 'info');
+    }
+
+    function renderStudentManagementList() {
+      const tbody = document.getElementById('studentManagementTbody');
+      const totalBadge = document.getElementById('totalStudentsCountBadge');
+      const searchKey = document.getElementById('studentSearchInput').value.toLowerCase().trim();
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      // Redundant safeguard: clear display if non-management somehow reaches here
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500 font-bold text-xs">Access denied.</td></tr>`;
+        return;
+      }
+
+      const filtered = studentList.filter(s => {
+        if (!searchKey) return true;
+        return s.name.toLowerCase().includes(searchKey) || s.roll.includes(searchKey) || s.stream.toLowerCase().includes(searchKey);
+      });
+
+      totalBadge.textContent = `${studentList.length} Students Total`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">No student profiles found matching your search.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition-colors";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-mono font-bold text-slate-900">#${s.roll}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-800">${s.name}</td>
+          <td class="py-2.5 px-3">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold ${s.stream === 'Core' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}">
+              ${s.stream}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-500">
+            Roll: <strong class="text-slate-800">${s.roll}</strong> (No password required)
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <button onclick="removeStudent('${s.roll}')" class="text-xs text-slate-400 hover:text-rose-600 transition p-1 cursor-pointer" title="Remove student login">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    // --- 10. VENUES & LOCATION DIRECTORY CONTROLLER ---
+    function populateCourseSelectOptions() {
+      const select = document.getElementById('editCourseSelect');
+      if (!select) return;
+      select.innerHTML = '';
+      courseDetails.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.code} - ${c.slot}`;
+        select.appendChild(opt);
+      });
+      if (courseDetails.length > 0) {
+        loadCourseDetailsIntoForm(courseDetails[0].id);
+      }
+    }
+
+    function loadCourseDetailsIntoForm(courseId) {
+      const found = courseDetails.find(c => c.id === courseId);
+      if (!found) return;
+      document.getElementById('editCourseSelect').value = found.id;
+      document.getElementById('editCourseName').value = found.name;
+      document.getElementById('editCourseSlot').value = found.slot;
+      document.getElementById('editCourseCredit').value = found.credit;
+      document.getElementById('editCourseFaculty').value = found.faculty;
+      document.getElementById('editCourseBuilding').value = `${found.building} (${found.floor})`;
+      document.getElementById('editCourseRoom').value = found.room;
+    }
+
+    function handleSaveCourseLocation(e) {
+      e.preventDefault();
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+
+      const courseId = document.getElementById('editCourseSelect').value;
+      const targetCourse = courseDetails.find(c => c.id === courseId);
+      if (!targetCourse) return;
+
+      targetCourse.name = document.getElementById('editCourseName').value.trim();
+      targetCourse.slot = document.getElementById('editCourseSlot').value.trim();
+      targetCourse.credit = parseInt(document.getElementById('editCourseCredit').value, 10);
+      targetCourse.faculty = document.getElementById('editCourseFaculty').value.trim();
+
+      const rawBuilding = document.getElementById('editCourseBuilding').value.trim();
+      targetCourse.building = rawBuilding;
+      targetCourse.floor = rawBuilding.includes('(') ? rawBuilding.substring(rawBuilding.indexOf('(')+1, rawBuilding.indexOf(')')) : 'Campus Floor';
+      targetCourse.room = document.getElementById('editCourseRoom').value.trim();
+
+      saveStorage('edup_mechd_courses_v9', courseDetails);
+      renderCourseDirectory();
+      updateIndianStandardTime();
+      showToast(`Location & slot details updated for ${targetCourse.code}!`, 'success');
+    }
+
+    function renderCourseDirectory() {
+      const tbody = document.getElementById('courseDetailsTbody');
+      const countBadge = document.getElementById('courseCountBadge');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      countBadge.textContent = `${courseDetails.length} Courses`;
+      const isStaff = currentUser && (currentUser.role === 'cr' || currentUser.role === 'fa');
+
+      courseDetails.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition-colors";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${c.code}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-800">${c.name}</td>
+          <td class="py-2.5 px-2 text-center font-bold text-brand-700">${c.credit}</td>
+          <td class="py-2.5 px-2 text-center font-mono font-semibold text-slate-600">${c.slot}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-700">${c.faculty}</td>
+          <td class="py-2.5 px-3 text-slate-600">${c.building} <span class="text-[10px] text-slate-400 block">${c.floor}</span></td>
+          <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${c.room}</td>
+          ${isStaff ? `
+            <td class="py-2.5 px-3 text-right">
+              <button onclick="loadCourseDetailsIntoForm('${c.id}'); document.getElementById('courseLocationEditorCard').scrollIntoView({ behavior: 'smooth' });" class="text-xs font-bold text-brand-600 hover:text-brand-800 px-2 py-1 rounded-lg hover:bg-brand-50 cursor-pointer">
+                Edit Venue
+              </button>
+            </td>
+          ` : ''}
+        `;
+        tbody.appendChild(tr);
       });
     }
 
-    function syncAccessControls() {
-      const editor = isEditor();
-      timetableForm.classList.toggle('hidden', !editor);
-      updatesForm.classList.toggle('hidden', !editor);
-      roleNote.textContent = editor
-        ? 'FA and CR can edit timetable and post/delete teacher updates.'
-        : 'Students can only view timetable and updates.';
-      renderUpdates();
+    // --- 11. RENDER TIMETABLE ---
+    function renderTimetable() {
+      const tbody = document.getElementById('timetableBodyRows');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const isStaff = currentUser && (currentUser.role === 'cr' || currentUser.role === 'fa');
+
+      timetable.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0";
+
+        let cols = `
+          <td class="py-3 px-2 sm:px-3 font-bold text-slate-800">
+            <span class="inline-block bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[11px] font-bold whitespace-nowrap">${row.day}</span>
+          </td>
+        `;
+
+        for (let pIdx = 0; pIdx < 10; pIdx++) {
+          const rawSubject = row.periods[pIdx];
+          const isSlotFree = !rawSubject || rawSubject.trim() === '' || rawSubject === '-';
+          const override = getOverrideForSlot(row.day, pIdx);
+
+          if (override && override.statusType === 'CANCELLED') {
+            cols += `
+              <td class="py-2 px-1 text-center">
+                <div class="p-1 rounded-lg bg-rose-50 border border-rose-200 min-w-[65px]">
+                  <div class="line-through text-slate-400 text-[9px] font-mono">${rawSubject}</div>
+                  <div class="text-[8px] font-extrabold text-rose-700 uppercase">CANCELLED</div>
+                </div>
+              </td>
+            `;
+          } else if (override && override.statusType === 'SUBSTITUTE') {
+            cols += `
+              <td class="py-2 px-1 text-center">
+                <div class="p-1 rounded-lg bg-amber-50 border border-amber-200 min-w-[65px]">
+                  <div class="text-[9px] font-bold text-amber-900 truncate">${override.substituteSubject || rawSubject}</div>
+                  <div class="text-[8px] font-bold text-amber-700 uppercase">SUB</div>
+                </div>
+              </td>
+            `;
+          } else if (isSlotFree) {
+            cols += `
+              <td class="py-2 px-1 text-center">
+                <span class="inline-block py-0.5 px-1 rounded bg-slate-100/70 border border-slate-200 text-slate-400 text-[9px] font-semibold uppercase">Free</span>
+              </td>
+            `;
+          } else {
+            cols += `
+              <td class="py-2 px-1 text-center">
+                <button 
+                  type="button" 
+                  data-day="${row.day}" 
+                  data-pidx="${pIdx}" 
+                  data-code="${rawSubject}"
+                  class="course-slot-btn inline-block py-1 px-1.5 rounded-md bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-800 hover:text-brand-700 text-[10px] sm:text-[11px] font-mono font-bold shadow-2xs whitespace-nowrap transition cursor-pointer active:scale-95" 
+                  title="Click for course venue details"
+                >
+                  ${rawSubject}
+                </button>
+              </td>
+            `;
+          }
+        }
+
+        if (isStaff) {
+          cols += `
+            <td class="py-2.5 px-2 text-right">
+              <button onclick="pickDayToEdit('${row.day}')" class="text-[11px] font-bold text-brand-600 hover:text-brand-800 hover:bg-brand-50 px-1.5 py-0.5 rounded transition cursor-pointer">
+                Edit
+              </button>
+            </td>
+          `;
+        }
+
+        tr.innerHTML = cols;
+        tbody.appendChild(tr);
+      });
+
+      document.querySelectorAll('.course-slot-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const day = btn.getAttribute('data-day');
+          const pidx = parseInt(btn.getAttribute('data-pidx'), 10);
+          const code = btn.getAttribute('data-code');
+          openCourseInfoModal(day, pidx, code);
+        });
+      });
+
+      if (isStaff) {
+        loadDayScheduleInForm(document.getElementById('editTTRowDay').value);
+      }
     }
 
-    timetableForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      if (!isEditor()) return;
+    function pickDayToEdit(day) {
+      const sel = document.getElementById('editTTRowDay');
+      sel.value = day;
+      loadDayScheduleInForm(day);
+      document.getElementById('timetableEditorCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
-      const day = document.getElementById('day').value;
-      const periods = [
-        document.getElementById('period1').value.trim(),
-        document.getElementById('period2').value.trim(),
-        document.getElementById('period3').value.trim(),
-        document.getElementById('period4').value.trim()
-      ];
+    function loadDayScheduleInForm(day) {
+      const found = timetable.find((r) => r.day === day);
+      if (found) {
+        for (let i = 0; i < 10; i++) {
+          const input = document.getElementById(`editSlot${i}`);
+          if (input) input.value = found.periods[i] || '-';
+        }
+      }
+    }
 
-      timetable = timetable.map((entry) => (entry.day === day ? { day, periods } : entry));
-      setStorage('crp_timetable', timetable);
+    function saveTimetableDay(e) {
+      e.preventDefault();
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+
+      const day = document.getElementById('editTTRowDay').value;
+      const periods = [];
+      for (let i = 0; i < 10; i++) {
+        const val = document.getElementById(`editSlot${i}`).value.trim();
+        periods.push(val || '-');
+      }
+
+      timetable = timetable.map((r) => (r.day === day ? { day, periods } : r));
+      saveStorage('edup_mechd_timetable_v9', timetable);
       renderTimetable();
-      timetableForm.reset();
+      updateIndianStandardTime();
+      showToast(`Master schedule for ${day} updated.`, 'success');
+    }
+
+    // --- 12. CANCELLATIONS CONTROLLER ---
+    function syncCancelSubjectPlaceholder() {
+      const day = document.getElementById('cancelDayInput').value;
+      const pIdx = parseInt(document.getElementById('cancelPeriodInput').value, 10);
+      const targetSchedule = timetable.find(t => t.day === day);
+      if (targetSchedule) {
+        const sub = targetSchedule.periods[pIdx];
+        document.getElementById('cancelSubstituteSubject').placeholder = `Current: ${sub} (Enter substitute)`;
+      }
+    }
+
+    function handleCreateClassOverride(e) {
+      e.preventDefault();
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+
+      const day = document.getElementById('cancelDayInput').value;
+      const periodIdx = parseInt(document.getElementById('cancelPeriodInput').value, 10);
+      const statusType = document.getElementById('cancelStatusType').value;
+      let substituteSubject = document.getElementById('cancelSubstituteSubject').value.trim();
+      const reason = document.getElementById('cancelReasonInput').value.trim();
+
+      const targetDayObj = timetable.find(t => t.day === day);
+      const originalSubject = targetDayObj ? targetDayObj.periods[periodIdx] : `Period ${periodIdx + 1}`;
+
+      if (!substituteSubject) {
+        substituteSubject = statusType === 'CANCELLED' ? 'Free Period' : 'Substituted Lecture';
+      }
+
+      classOverrides = classOverrides.filter(ovr => !(ovr.day === day && ovr.periodIdx === periodIdx));
+
+      const newOverride = {
+        id: 'ovr-' + Date.now(),
+        day,
+        periodIdx,
+        originalSubject,
+        statusType,
+        substituteSubject,
+        reason,
+        updatedBy: currentUser.name,
+        updatedAt: new Date().toISOString()
+      };
+
+      classOverrides.unshift(newOverride);
+      saveStorage('edup_mechd_overrides_v9', classOverrides);
+
+      const autoNotice = {
+        id: 'ann-' + Date.now(),
+        subject: originalSubject,
+        teacher: 'Section Admin (CR/FA)',
+        category: 'Cancellation',
+        content: `🚨 NOTICE: Period ${periodIdx + 1} (${originalSubject}) on ${day} has been marked as ${statusType}. Details: ${reason} (Substitute/Plan: ${substituteSubject})`,
+        fileName: null,
+        fileData: null,
+        postedBy: currentUser.name,
+        postedAt: new Date().toISOString()
+      };
+      announcements.unshift(autoNotice);
+      saveStorage('edup_mechd_announcements_v9', announcements);
+
+      document.getElementById('cancelReasonInput').value = '';
+      document.getElementById('cancelSubstituteSubject').value = '';
+      isBannerDismissed = false;
+
+      showToast(`Class status broadcasted to all students!`, 'success');
+      document.getElementById('tabBadgeCancellations').textContent = classOverrides.length;
+      document.getElementById('tabBadgeUpdates').textContent = announcements.length;
+
+      renderCancellations();
+      renderTimetable();
+      updateIndianStandardTime();
+    }
+
+    function removeClassOverride(id) {
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+      classOverrides = classOverrides.filter(ovr => ovr.id !== id);
+      saveStorage('edup_mechd_overrides_v9', classOverrides);
+      showToast('Period restored to original schedule.', 'info');
+      document.getElementById('tabBadgeCancellations').textContent = classOverrides.length;
+      renderCancellations();
+      renderTimetable();
+      updateIndianStandardTime();
+    }
+
+    function renderCancellations() {
+      const container = document.getElementById('cancellationsList');
+      const badgeCount = document.getElementById('activeOverridesCountBadge');
+      container.innerHTML = '';
+
+      badgeCount.textContent = `${classOverrides.length} Override${classOverrides.length === 1 ? '' : 's'} Active`;
+
+      if (classOverrides.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">No cancellations active. All classes run on regular schedule.</div>`;
+        return;
+      }
+
+      const isStaff = currentUser && (currentUser.role === 'cr' || currentUser.role === 'fa');
+
+      classOverrides.forEach((ovr) => {
+        const item = document.createElement('div');
+        const isCancelled = ovr.statusType === 'CANCELLED';
+        item.className = `border rounded-2xl p-3 shadow-xs space-y-2 transition ${isCancelled ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200'}`;
+
+        const pSlot = PERIOD_SLOTS.find(p => p.idx === ovr.periodIdx);
+        const timingStr = pSlot ? pSlot.timeStr : `Period ${ovr.periodIdx + 1}`;
+
+        const formattedDate = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: '2-digit',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }).format(new Date(ovr.updatedAt));
+
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${isCancelled ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-amber-100 text-amber-800 border-amber-300'}">
+                ${ovr.statusType}
+              </span>
+              <span class="text-xs font-extrabold text-slate-800">${ovr.day} • ${timingStr}</span>
+              <span class="text-xs text-slate-500 line-through">Original: ${ovr.originalSubject}</span>
+            </div>
+            ${isStaff ? `
+              <button onclick="removeClassOverride('${ovr.id}')" class="text-[11px] font-bold text-slate-500 hover:text-rose-600 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs hover:border-rose-300 transition cursor-pointer">
+                Revert
+              </button>
+            ` : ''}
+          </div>
+
+          <div class="text-xs text-slate-700 leading-relaxed">
+            <div><strong class="text-slate-900">Remarks:</strong> ${ovr.reason}</div>
+            <div class="mt-0.5"><strong class="text-slate-900">Current:</strong> <span class="font-bold ${isCancelled ? 'text-rose-700' : 'text-amber-800'}">${ovr.substituteSubject}</span></div>
+          </div>
+
+          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-200/60">
+            <span>By: <strong class="text-slate-600">${ovr.updatedBy}</strong></span>
+            <span>${formattedDate} IST</span>
+          </div>
+        `;
+
+        container.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    // --- 13. UPDATES & NOTES UPLOADS ---
+    function setAnnouncementFilter(category) {
+      currentAnnouncementFilter = category;
+      ['ALL', 'Notes', 'Cancellation', 'Exam', 'Circular'].forEach(c => {
+        const chip = document.getElementById(`filterChip-${c}`);
+        if (chip) {
+          chip.className = c === category 
+            ? "px-2.5 py-1 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap cursor-pointer"
+            : "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-medium whitespace-nowrap cursor-pointer";
+        }
+      });
+      renderAnnouncements();
+    }
+
+    function renderAnnouncements() {
+      const container = document.getElementById('announcementsList');
+      const searchKey = document.getElementById('announcementSearch').value.toLowerCase().trim();
+      container.innerHTML = '';
+
+      const filtered = announcements.filter((item) => {
+        if (currentAnnouncementFilter !== 'ALL' && item.category !== currentAnnouncementFilter) return false;
+        if (searchKey) {
+          const m1 = item.subject.toLowerCase().includes(searchKey);
+          const m2 = item.teacher.toLowerCase().includes(searchKey);
+          const m3 = item.content.toLowerCase().includes(searchKey);
+          const m4 = item.fileName && item.fileName.toLowerCase().includes(searchKey);
+          if (!m1 && !m2 && !m3 && !m4) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">No updates found matching criteria.</div>`;
+        return;
+      }
+
+      const catBadges = {
+        Notes: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        Exam: 'bg-rose-50 text-rose-700 border-rose-200',
+        Cancellation: 'bg-rose-100 text-rose-800 border-rose-300 font-black',
+        Circular: 'bg-purple-50 text-purple-700 border-purple-200'
+      };
+
+      const isStaff = currentUser && (currentUser.role === 'cr' || currentUser.role === 'fa');
+
+      filtered.forEach((ann) => {
+        const item = document.createElement('div');
+        item.className = "bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2 hover:border-slate-300 transition";
+
+        const badgeClass = catBadges[ann.category] || 'bg-slate-100 text-slate-700 border-slate-200';
+        
+        const formattedDate = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: '2-digit',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }).format(new Date(ann.postedAt));
+
+        let fileAttachmentSection = '';
+        if (ann.fileName) {
+          fileAttachmentSection = `
+            <div class="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 border border-brand-100">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                </div>
+                <div class="truncate">
+                  <div class="font-bold text-slate-800 truncate text-[11px]">${ann.fileName}</div>
+                  <div class="text-[9px] text-slate-400">Class study resource</div>
+                </div>
+              </div>
+              <button onclick="downloadAttachment('${ann.id}')" class="px-2.5 py-1 bg-white hover:bg-brand-50 text-brand-700 rounded-lg font-bold border border-slate-200 transition shadow-2xs flex items-center gap-1 shrink-0 cursor-pointer text-xs">
+                <i data-lucide="download" class="w-3 h-3"></i>
+                <span>Get</span>
+              </button>
+            </div>
+          `;
+        }
+
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-xs font-black text-slate-900">${ann.subject}</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}">
+                ${ann.category}
+              </span>
+            </div>
+            ${isStaff ? `
+              <button onclick="removeAnnouncement('${ann.id}')" class="text-slate-400 hover:text-rose-600 transition p-1 cursor-pointer" title="Delete update">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            ` : ''}
+          </div>
+
+          <p class="text-xs text-slate-700 leading-relaxed font-normal">${ann.content}</p>
+
+          ${fileAttachmentSection}
+
+          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-100">
+            <span class="font-medium text-slate-600">Faculty/Post: ${ann.teacher}</span>
+            <span>${formattedDate} IST</span>
+          </div>
+        `;
+
+        container.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function postNewAnnouncement(e) {
+      e.preventDefault();
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+
+      const subject = document.getElementById('annSubject').value.trim();
+      const teacher = document.getElementById('annTeacher').value.trim();
+      const category = document.getElementById('annCategory').value;
+      const content = document.getElementById('annContent').value.trim();
+      const fileInput = document.getElementById('annFileInput');
+
+      const finalizePost = (fileName, fileData) => {
+        const newPost = {
+          id: 'ann-' + Date.now(),
+          subject,
+          teacher,
+          category,
+          content,
+          fileName,
+          fileData,
+          postedBy: currentUser.name,
+          postedAt: new Date().toISOString()
+        };
+
+        announcements.unshift(newPost);
+        saveStorage('edup_mechd_announcements_v9', announcements);
+
+        document.getElementById('annSubject').value = '';
+        document.getElementById('annTeacher').value = '';
+        document.getElementById('annContent').value = '';
+        document.getElementById('annFileInput').value = '';
+
+        document.getElementById('tabBadgeUpdates').textContent = announcements.length;
+        renderAnnouncements();
+        showToast('Update & document uploaded for all students!', 'success');
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          finalizePost(file.name, event.target.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        finalizePost(null, null);
+      }
+    }
+
+    function downloadAttachment(annId) {
+      const ann = announcements.find(a => a.id === annId);
+      if (!ann || !ann.fileName) return;
+
+      if (ann.fileData) {
+        const a = document.createElement('a');
+        a.href = ann.fileData;
+        a.download = ann.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast(`Downloading ${ann.fileName}`, 'info');
+      } else {
+        const sampleText = `Dept. Mechanical Engineering - Section D (Batch 2)\nCourse: ${ann.subject}\nFaculty: ${ann.teacher}\n\nNotice & Study Notes:\n${ann.content}\n\nGenerated from Mech D Classroom Portal.`;
+        const blob = new Blob([sampleText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = ann.fileName.includes('.') ? ann.fileName : `${ann.fileName}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Downloaded: ${ann.fileName}`, 'info');
+      }
+    }
+
+    function removeAnnouncement(id) {
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+      announcements = announcements.filter((a) => a.id !== id);
+      saveStorage('edup_mechd_announcements_v9', announcements);
+      document.getElementById('tabBadgeUpdates').textContent = announcements.length;
+      renderAnnouncements();
+      showToast('Announcement removed.', 'info');
+    }
+
+    // --- 14. GRIEVANCES CONTROLLER ---
+    function toggleGrievanceForm() {
+      const form = document.getElementById('grievanceForm');
+      const btn = document.getElementById('btnToggleGrievanceForm');
+      if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        btn.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5"></i><span>Close</span>`;
+        document.getElementById('grvTitle').focus();
+      } else {
+        form.classList.add('hidden');
+        btn.innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Lodge</span>`;
+      }
+      lucide.createIcons();
+    }
+
+    function submitStudentGrievance(e) {
+      e.preventDefault();
+      const category = document.getElementById('grvCategory').value;
+      const severity = document.getElementById('grvSeverity').value;
+      const title = document.getElementById('grvTitle').value.trim();
+      const description = document.getElementById('grvDescription').value.trim();
+      const isAnonymous = document.getElementById('grvAnonymous').checked;
+
+      const newGrievance = {
+        id: 'GRV-' + Math.floor(100 + Math.random() * 900),
+        title,
+        category,
+        severity,
+        description,
+        studentEmail: currentUser.email,
+        studentName: isAnonymous ? 'Anonymous Student' : currentUser.name,
+        studentRoll: isAnonymous ? 'Anonymous' : currentUser.rollNo,
+        isAnonymous,
+        status: 'Submitted',
+        submittedAt: new Date().toISOString(),
+        crRemark: '',
+        crRemarkDate: null,
+        faResolution: '',
+        faResolutionDate: null
+      };
+
+      grievances.unshift(newGrievance);
+      saveStorage('edup_mechd_grievances_v9', grievances);
+
+      document.getElementById('grievanceForm').reset();
+      toggleGrievanceForm();
+      document.getElementById('tabBadgeGrievances').textContent = grievances.length;
+      renderGrievanceList();
+      showToast('Grievance registered and routed for CR review.', 'success');
+    }
+
+    function renderGrievanceList() {
+      const container = document.getElementById('grievanceCardsContainer');
+      const searchKey = document.getElementById('grvSearch').value.toLowerCase().trim();
+      container.innerHTML = '';
+
+      document.getElementById('statTotalGrievances').textContent = grievances.length;
+      document.getElementById('statPendingGrievances').textContent = grievances.filter((g) => g.status === 'Submitted' || g.status === 'Under Review by CR').length;
+      document.getElementById('statForwardedGrievances').textContent = grievances.filter((g) => g.status === 'Forwarded to FA').length;
+      document.getElementById('statResolvedGrievances').textContent = grievances.filter((g) => g.status === 'Resolved' || g.status === 'Closed').length;
+
+      const list = grievances.filter((g) => {
+        if (searchKey) {
+          const m1 = g.title.toLowerCase().includes(searchKey);
+          const m2 = g.description.toLowerCase().includes(searchKey);
+          const m3 = g.id.toLowerCase().includes(searchKey);
+          if (!m1 && !m2 && !m3) return false;
+        }
+        return true;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">No grievance records found.</div>`;
+        return;
+      }
+
+      list.forEach((g) => {
+        const card = createGrievanceCard(g);
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function createGrievanceCard(g) {
+      const card = document.createElement('div');
+      card.className = "bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2.5 hover:border-slate-300 transition";
+
+      const statusStyles = {
+        'Submitted': 'bg-blue-50 text-blue-700 border-blue-200',
+        'Under Review by CR': 'bg-amber-50 text-amber-800 border-amber-200',
+        'Forwarded to FA': 'bg-purple-50 text-purple-800 border-purple-200',
+        'Resolved': 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        'Closed': 'bg-slate-100 text-slate-700 border-slate-300'
+      };
+
+      const severityStyles = {
+        'Low': 'bg-slate-100 text-slate-600',
+        'Medium': 'bg-amber-100 text-amber-800',
+        'Urgent': 'bg-rose-100 text-rose-800 font-bold'
+      };
+
+      const statusBadge = statusStyles[g.status] || 'bg-slate-100 text-slate-700 border-slate-200';
+      const sevBadge = severityStyles[g.severity] || 'bg-slate-100 text-slate-700';
+
+      const submittedTime = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).format(new Date(g.submittedAt));
+
+      let actionButtons = '';
+      if (currentUser && currentUser.role === 'cr') {
+        actionButtons = `
+          <button onclick="openActionModal('${g.id}', 'cr')" class="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-black text-white text-[11px] font-bold transition shadow-xs flex items-center gap-1 cursor-pointer">
+            <i data-lucide="edit-3" class="w-3 h-3"></i>
+            <span>Action</span>
+          </button>
+        `;
+      } else if (currentUser && currentUser.role === 'fa') {
+        actionButtons = `
+          <button onclick="openActionModal('${g.id}', 'fa')" class="px-2.5 py-1 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold transition shadow-xs flex items-center gap-1 cursor-pointer">
+            <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+            <span>FA Order</span>
+          </button>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">${g.id}</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}">${g.status}</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded-full ${sevBadge}">Sev: ${g.severity}</span>
+            <span class="text-[11px] text-slate-400 font-medium">• ${g.category}</span>
+          </div>
+          <div>${actionButtons}</div>
+        </div>
+
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">${g.title}</h4>
+          <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">${g.description}</p>
+        </div>
+
+        ${(g.crRemark || g.faResolution) ? `
+          <div class="space-y-1.5 pt-1.5 border-t border-slate-100 text-xs">
+            ${g.crRemark ? `
+              <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-2 text-amber-900 text-[11px]">
+                <span class="font-bold text-amber-800 block text-[10px]">CR Endorsement:</span>
+                <p class="text-slate-700">${g.crRemark}</p>
+              </div>
+            ` : ''}
+
+            ${g.faResolution ? `
+              <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2 text-emerald-950 text-[11px]">
+                <span class="font-bold text-emerald-800 block text-[10px]">Official Faculty Resolution:</span>
+                <p class="text-slate-800 font-medium">${g.faResolution}</p>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-100">
+          <div>By: <strong class="text-slate-600">${g.studentName}</strong> ${g.isAnonymous ? '<span class="bg-slate-100 text-slate-500 px-1 rounded text-[9px]">Masked</span>' : `(${g.studentRoll})`}</div>
+          <div>${submittedTime} IST</div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function openActionModal(grievanceId, role) {
+      const g = grievances.find((item) => item.id === grievanceId);
+      if (!g) return;
+
+      document.getElementById('modalGrvId').value = g.id;
+      document.getElementById('modalGrievanceTitle').textContent = g.title;
+      document.getElementById('modalGrievanceMeta').textContent = `ID: ${g.id} • ${g.category} • Current Status: ${g.status}`;
+      document.getElementById('modalGrievanceDesc').textContent = g.description;
+
+      const crFields = document.getElementById('crModalFields');
+      const faFields = document.getElementById('faModalFields');
+      const roleBadge = document.getElementById('modalRoleBadge');
+
+      if (role === 'cr') {
+        roleBadge.textContent = "Class Representative Review Panel";
+        roleBadge.className = "text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200";
+        crFields.classList.remove('hidden');
+        faFields.classList.add('hidden');
+        document.getElementById('modalCrNote').value = g.crRemark || '';
+      } else {
+        roleBadge.textContent = "Faculty Adviser Formal Resolution Panel";
+        roleBadge.className = "text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200";
+        faFields.classList.remove('hidden');
+        crFields.classList.add('hidden');
+        document.getElementById('modalFaNote').value = g.faResolution || '';
+      }
+
+      const modal = document.getElementById('actionModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeActionModal() {
+      const modal = document.getElementById('actionModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleModalActionSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('modalGrvId').value;
+      const gIndex = grievances.findIndex((item) => item.id === id);
+      if (gIndex === -1) return;
+
+      if (currentUser.role === 'cr') {
+        const actionType = document.getElementById('modalCrActionType').value;
+        const note = document.getElementById('modalCrNote').value.trim();
+
+        if (actionType === 'forward_fa') {
+          grievances[gIndex].status = 'Forwarded to FA';
+        } else if (actionType === 'cr_resolve') {
+          grievances[gIndex].status = 'Resolved';
+        } else {
+          grievances[gIndex].status = 'Under Review by CR';
+        }
+
+        grievances[gIndex].crRemark = note;
+        grievances[gIndex].crRemarkDate = new Date().toISOString();
+        showToast(`Grievance ${id} updated to: ${grievances[gIndex].status}`, 'success');
+
+      } else if (currentUser.role === 'fa') {
+        const actionType = document.getElementById('modalFaActionType').value;
+        const note = document.getElementById('modalFaNote').value.trim();
+
+        if (actionType === 'fa_resolve') {
+          grievances[gIndex].status = 'Resolved';
+        } else if (actionType === 'fa_close') {
+          grievances[gIndex].status = 'Closed';
+        } else {
+          grievances[gIndex].status = 'Under Review by CR';
+        }
+
+        grievances[gIndex].faResolution = note;
+        grievances[gIndex].faResolutionDate = new Date().toISOString();
+        showToast(`Official Faculty Resolution Order filed for ${id}`, 'success');
+      }
+
+      saveStorage('edup_mechd_grievances_v9', grievances);
+      closeActionModal();
+      renderGrievanceList();
+    }
+
+    // --- 15. INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshAppState();
+      setInterval(updateIndianStandardTime, 1000);
+      updateIndianStandardTime();
     });
-
-    updatesForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      if (!isEditor()) return;
-
-      const subject = document.getElementById('subject').value.trim();
-      const teacher = document.getElementById('teacher').value.trim();
-      const message = document.getElementById('message').value.trim();
-      if (!subject || !teacher || !message) return;
-
-      updates.push({ subject, teacher, message, createdAt: new Date().toISOString() });
-      setStorage('crp_updates', updates);
-      renderUpdates();
-      updatesForm.reset();
-    });
-
-    roleSelect.addEventListener('change', syncAccessControls);
-
-    renderTimetable();
-    renderUpdates();
-    syncAccessControls();
   </script>
 </body>
 </html>
