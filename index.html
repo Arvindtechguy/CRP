@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classroom Portal</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f6fb;
+      color: #1c2430;
+    }
+
+    header {
+      background: #2b4db9;
+      color: #fff;
+      padding: 1rem;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 1rem auto;
+      padding: 0 1rem 2rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2 {
+      margin: 0 0 0.75rem;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    select, input, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.55rem;
+      margin-top: 0.3rem;
+      margin-bottom: 0.8rem;
+      border: 1px solid #ccd3e0;
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    button {
+      background: #2b4db9;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #5d6474;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #d8deea;
+      text-align: left;
+      padding: 0.55rem;
+      vertical-align: top;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      border: 1px solid #d8deea;
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-bottom: 0.65rem;
+      background: #fafbff;
+    }
+
+    .meta {
+      color: #4f5d79;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .role-note {
+      margin-top: -0.3rem;
+      margin-bottom: 0.9rem;
+      color: #425272;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Classroom Portal</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2>Access Role</h2>
+      <label for="role">Select your role</label>
+      <select id="role">
+        <option value="student">Student (View only)</option>
+        <option value="fa">Faculty Adviser (Edit access)</option>
+        <option value="cr">Class Representative (Edit access)</option>
+      </select>
+      <p id="roleNote" class="role-note">Students can only view timetable and updates.</p>
+    </section>
+
+    <section>
+      <h2>Weekly Timetable</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Period 1</th>
+            <th>Period 2</th>
+            <th>Period 3</th>
+            <th>Period 4</th>
+          </tr>
+        </thead>
+        <tbody id="timetableBody"></tbody>
+      </table>
+
+      <form id="timetableForm" class="hidden" aria-label="Edit timetable">
+        <div class="grid">
+          <div>
+            <label for="day">Day</label>
+            <select id="day" required>
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+            </select>
+          </div>
+          <div>
+            <label for="period1">Period 1</label>
+            <input id="period1" required />
+          </div>
+          <div>
+            <label for="period2">Period 2</label>
+            <input id="period2" required />
+          </div>
+          <div>
+            <label for="period3">Period 3</label>
+            <input id="period3" required />
+          </div>
+          <div>
+            <label for="period4">Period 4</label>
+            <input id="period4" required />
+          </div>
+        </div>
+        <button type="submit">Save Day Timetable</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Subject Teacher Updates</h2>
+      <ul id="updatesList"></ul>
+
+      <form id="updatesForm" class="hidden" aria-label="Post teacher update">
+        <label for="subject">Subject</label>
+        <input id="subject" required />
+
+        <label for="teacher">Teacher</label>
+        <input id="teacher" required />
+
+        <label for="message">Update</label>
+        <textarea id="message" rows="3" required></textarea>
+
+        <button type="submit">Post Update</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const roleSelect = document.getElementById('role');
+    const roleNote = document.getElementById('roleNote');
+    const timetableForm = document.getElementById('timetableForm');
+    const updatesForm = document.getElementById('updatesForm');
+    const timetableBody = document.getElementById('timetableBody');
+    const updatesList = document.getElementById('updatesList');
+
+    const defaultTimetable = [
+      { day: 'Monday', periods: ['Math', 'Physics', 'Chemistry', 'English'] },
+      { day: 'Tuesday', periods: ['Biology', 'Math', 'History', 'Computer'] },
+      { day: 'Wednesday', periods: ['English', 'Chemistry', 'Math', 'Physics'] },
+      { day: 'Thursday', periods: ['Computer', 'Biology', 'English', 'Math'] },
+      { day: 'Friday', periods: ['Physics', 'History', 'Chemistry', 'Sports'] }
+    ];
+
+    const defaultUpdates = [
+      {
+        subject: 'Math',
+        teacher: 'Mr. Raman',
+        message: 'Unit test on Friday. Practice chapter 3 and 4.',
+        createdAt: new Date().toISOString()
+      }
+    ];
+
+    function getStorage(key, fallback) {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return fallback;
+      }
+    }
+
+    function setStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    let timetable = getStorage('crp_timetable', defaultTimetable);
+    let updates = getStorage('crp_updates', defaultUpdates);
+
+    function isEditor() {
+      return roleSelect.value === 'fa' || roleSelect.value === 'cr';
+    }
+
+    function renderTimetable() {
+      timetableBody.innerHTML = '';
+      timetable.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.day}</td>
+          <td>${row.periods[0]}</td>
+          <td>${row.periods[1]}</td>
+          <td>${row.periods[2]}</td>
+          <td>${row.periods[3]}</td>
+        `;
+        timetableBody.appendChild(tr);
+      });
+    }
+
+    function renderUpdates() {
+      updatesList.innerHTML = '';
+      const sorted = [...updates].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      sorted.forEach((item, index) => {
+        const li = document.createElement('li');
+        const dateText = new Date(item.createdAt).toLocaleString();
+        li.innerHTML = `
+          <div class="meta"><strong>${item.subject}</strong> | ${item.teacher} | ${dateText}</div>
+          <div>${item.message}</div>
+        `;
+
+        if (isEditor()) {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.className = 'secondary';
+          deleteBtn.addEventListener('click', () => {
+            const target = sorted[index];
+            updates = updates.filter((u) => !(u.subject === target.subject && u.teacher === target.teacher && u.message === target.message && u.createdAt === target.createdAt));
+            setStorage('crp_updates', updates);
+            renderUpdates();
+          });
+          li.appendChild(deleteBtn);
+        }
+
+        updatesList.appendChild(li);
+      });
+    }
+
+    function syncAccessControls() {
+      const editor = isEditor();
+      timetableForm.classList.toggle('hidden', !editor);
+      updatesForm.classList.toggle('hidden', !editor);
+      roleNote.textContent = editor
+        ? 'FA and CR can edit timetable and post/delete teacher updates.'
+        : 'Students can only view timetable and updates.';
+      renderUpdates();
+    }
+
+    timetableForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!isEditor()) return;
+
+      const day = document.getElementById('day').value;
+      const periods = [
+        document.getElementById('period1').value.trim(),
+        document.getElementById('period2').value.trim(),
+        document.getElementById('period3').value.trim(),
+        document.getElementById('period4').value.trim()
+      ];
+
+      timetable = timetable.map((entry) => (entry.day === day ? { day, periods } : entry));
+      setStorage('crp_timetable', timetable);
+      renderTimetable();
+      timetableForm.reset();
+    });
+
+    updatesForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!isEditor()) return;
+
+      const subject = document.getElementById('subject').value.trim();
+      const teacher = document.getElementById('teacher').value.trim();
+      const message = document.getElementById('message').value.trim();
+      if (!subject || !teacher || !message) return;
+
+      updates.push({ subject, teacher, message, createdAt: new Date().toISOString() });
+      setStorage('crp_updates', updates);
+      renderUpdates();
+      updatesForm.reset();
+    });
+
+    roleSelect.addEventListener('change', syncAccessControls);
+
+    renderTimetable();
+    renderUpdates();
+    syncAccessControls();
+  </script>
+</body>
+</html>
