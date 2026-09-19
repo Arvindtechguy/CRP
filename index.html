@@ -337,6 +337,7 @@
                 <option value="Day 3">Day 3</option>
                 <option value="Day 4">Day 4</option>
                 <option value="Day 5">Day 5</option>
+                <option value="Holiday">Holiday</option>
               </select>
               <span id="dayOrderEditLockNote" class="text-[9px] text-slate-400"></span>
             </div>
@@ -969,6 +970,7 @@
         <div>
           <span id="popupSlotBadge" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-200 font-mono">Day • Period</span>
           <h3 id="popupCourseName" class="text-sm sm:text-base font-bold text-slate-900 mt-1 leading-snug">Course Name</h3>
+          <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Subject Code</span>
           <span id="popupCourseCode" class="text-xs font-mono font-bold text-indigo-600">26MEE1002L</span>
         </div>
         <button onclick="closeCourseInfoModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold cursor-pointer">&times;</button>
@@ -999,7 +1001,8 @@
         </div>
       </div>
 
-      <div class="pt-1">
+      <div class="pt-1 space-y-2">
+        <button id="popupVenueEditButton" onclick="editCourseVenueFromModal()" class="hidden w-full py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold rounded-xl transition cursor-pointer">Edit Venue & Slot</button>
         <button onclick="closeCourseInfoModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition cursor-pointer">Close</button>
       </div>
     </div>
@@ -1636,6 +1639,19 @@
 
       if (!liveName) return;
 
+      if (dayName === 'Holiday') {
+        liveName.textContent = 'Holiday';
+        liveMeta.textContent = 'No classes scheduled today';
+        liveTiming.textContent = 'All Day';
+        liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> HOLIDAY`;
+        liveCurrentBox.className = "bg-rose-900/30 backdrop-blur-md rounded-2xl p-3.5 border border-rose-500/30 space-y-1";
+        liveCurrentBox.onclick = null;
+        nextName.textContent = 'No classes - Holiday';
+        nextMeta.textContent = 'Timetable unchanged for the next working day';
+        nextTiming.textContent = '--';
+        return;
+      }
+
       const todaySchedule = timetable.find(t => t.day === dayName);
       if (!todaySchedule) return;
 
@@ -1808,6 +1824,8 @@
         document.getElementById('popupBuilding').textContent = 'Mechanical Engineering Dept.';
       }
 
+      const venueEditButton = document.getElementById('popupVenueEditButton');
+      venueEditButton.classList.toggle('hidden', !(currentUser && (currentUser.role === 'cr' || currentUser.role === 'fa')));
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
@@ -2342,6 +2360,7 @@
 
       saveStorage('edup_mechd_courses_v11', courseDetails);
       renderCourseDirectory();
+      renderTimetable();
       updateIndianStandardTime();
       showToast(`Location & slot details updated for ${targetCourse.code}!`, 'success');
     }
@@ -2424,6 +2443,11 @@
               </td>
             `;
           } else {
+            const courseInfo = getCourseInfo(rawSubject);
+            const venueLabel = courseInfo ? courseInfo.room : 'Venue pending';
+            const slotLabel = courseInfo ? courseInfo.slot : 'Slot pending';
+            const subjectName = courseInfo ? courseInfo.name : rawSubject;
+            const shortSubjectName = subjectName.length > 24 ? `${subjectName.slice(0, 24)}...` : subjectName;
             cols += `
               <td class="py-2 px-1 text-center">
                 <button 
@@ -2431,10 +2455,12 @@
                   data-day="${row.day}" 
                   data-pidx="${pIdx}" 
                   data-code="${rawSubject}"
-                  class="course-slot-btn inline-block py-1 px-1.5 rounded-md bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-800 hover:text-brand-700 text-[10px] sm:text-[11px] font-mono font-bold shadow-2xs whitespace-nowrap transition cursor-pointer active:scale-95" 
-                  title="Click for course venue details"
+                  class="course-slot-btn inline-block min-w-[82px] py-1 px-1.5 rounded-md bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-800 hover:text-brand-700 text-[10px] sm:text-[11px] font-mono font-bold shadow-2xs whitespace-nowrap transition cursor-pointer active:scale-95" 
+                  title="Click for course venue and slot details"
                 >
-                  ${rawSubject}
+                  <span class="block font-sans text-[9px] font-extrabold truncate" title="${subjectName}">${shortSubjectName}</span>
+                  <span class="block text-[8px] font-sans font-bold text-brand-700 truncate" title="${venueLabel}">${venueLabel}</span>
+                  <span class="block text-[8px] font-sans font-medium text-slate-400 truncate" title="Slot ${slotLabel}">Slot: ${slotLabel}</span>
                 </button>
               </td>
             `;
@@ -2484,6 +2510,17 @@
           if (input) input.value = found.periods[i] || '-';
         }
       }
+    }
+
+    function editCourseVenueFromModal() {
+      if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
+      const courseCode = document.getElementById('popupCourseCode').textContent;
+      const course = courseDetails.find(item => item.code === courseCode);
+      if (!course) return;
+      closeCourseInfoModal();
+      switchTab('courseDirectoryTab');
+      loadCourseDetailsIntoForm(course.id);
+      document.getElementById('courseLocationEditorCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function saveTimetableDay(e) {
