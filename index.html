@@ -1349,6 +1349,9 @@
       }
       if (currentUser.role === 'cr') {
         return [
+          { value: 'assigned_crs', label: 'Assigned CRs' },
+          { value: 'all_crs', label: 'All CRs' },
+          { value: 'fa', label: 'Faculty Adviser (FA)' },
           { value: 'assigned_students', label: 'Assigned Students' },
           { value: 'all_students', label: 'All Students' }
         ];
@@ -1400,11 +1403,13 @@
       picker.classList.toggle('hidden', !needsPicker);
       select.required = needsPicker;
       const labels = {
+        assigned_crs: 'Assigned CRs',
         all_crs: 'All CRs',
         selected_crs: 'Selected CRs',
         selected_students: 'Students',
         assigned_students: 'Assigned Students',
         all_students: 'All Students',
+        fa: 'Faculty Adviser',
         all_students_crs: 'Everyone'
       };
       scope.textContent = labels[audienceType] || '';
@@ -2766,6 +2771,14 @@
       if (audienceType === 'selected_crs' || audienceType === 'selected_students') return selectedIds;
       if (audienceType === 'all_crs') {
         return Object.values(STAFF_ACCOUNTS).filter(account => account.role === 'cr').map(account => account.email);
+      }
+      if (audienceType === 'assigned_crs') {
+        return Object.values(STAFF_ACCOUNTS)
+          .filter(account => account.role === 'cr' && account.stream === currentUser.stream && account.email !== currentUser.email)
+          .map(account => account.email);
+      }
+      if (audienceType === 'fa') {
+        return ['fa@gmail.com'];
       }
       if (audienceType === 'assigned_students') {
         return getStudentRecipientOptions(getAssignedStudentsForCr(currentUser)).map(option => option.id);
