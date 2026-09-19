@@ -69,6 +69,46 @@
     
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @media (max-width: 639px) {
+      body { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom)) !important; }
+      #headerClockWrap { display: none; }
+      #dashboardApp { padding-bottom: 0.5rem; }
+      #mobileAppTabs {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 40;
+        padding: 0.35rem 0.35rem calc(0.35rem + env(safe-area-inset-bottom));
+        background: rgba(255, 255, 255, 0.96);
+        border-top: 1px solid #e2e8f0;
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(12px);
+      }
+      #mobileAppTabs button {
+        min-width: 4.25rem;
+        min-height: 3.25rem;
+        flex: 1 0 auto;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.2rem;
+        padding: 0.35rem 0.25rem;
+        border-bottom-width: 0;
+        border-radius: 0.75rem;
+        font-size: 0.625rem;
+      }
+      #mobileAppTabs button span:not([id^="tabBadge"]) { line-height: 1.1; }
+      #mobileAppTabs button i { width: 1.05rem; height: 1.05rem; }
+      #mobileAppTabs button.border-brand-600 { background: #eef2ff; }
+      #announcementPostCard { order: 1; }
+      #announcementFeedCol { order: 2; }
+      #dashboardApp .overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      input, select, textarea, button { min-height: 2.75rem; }
+      input[type="checkbox"] { min-height: 1rem; }
+      .modal-backdrop { align-items: flex-end; padding: 0; }
+      .modal-backdrop > div { width: 100%; max-height: 88vh; overflow-y: auto; border-radius: 1.5rem 1.5rem 0 0; }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white pb-12 sm:pb-6">
@@ -78,7 +118,7 @@
 
   <!-- Header Navigation -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
       
       <!-- Brand Logo -->
       <div class="flex items-center space-x-2 sm:space-x-3 truncate">
@@ -96,7 +136,7 @@
 
       <!-- Live Clock & User Area -->
       <div class="flex items-center gap-2 shrink-0">
-        <div class="flex items-center gap-1.5 bg-slate-100/90 px-2.5 py-1 rounded-xl border border-slate-200 text-[11px] font-medium">
+        <div id="headerClockWrap" class="flex items-center gap-1.5 bg-slate-100/90 px-2.5 py-1 rounded-xl border border-slate-200 text-[11px] font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-500 pulsing-dot"></span>
           <span class="text-[9px] font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-100 px-1 py-0.2 rounded">IST</span>
           <span id="headerClockTime" class="font-mono font-bold text-slate-800 text-xs">--:-- AM</span>
@@ -335,6 +375,7 @@
                 <option value="Day 3">Day 3</option>
                 <option value="Day 4">Day 4</option>
                 <option value="Day 5">Day 5</option>
+                <option value="Holiday">Holiday</option>
               </select>
               <span id="dayOrderEditLockNote" class="text-[9px] text-slate-400"></span>
             </div>
@@ -371,7 +412,7 @@
     </div>
 
     <!-- TABS NAVIGATION BAR -->
-    <div class="flex border-b border-slate-200 gap-1.5 sm:gap-4 overflow-x-auto pb-px no-scrollbar text-xs sm:text-sm">
+    <div id="mobileAppTabs" class="flex border-b border-slate-200 gap-1.5 sm:gap-4 overflow-x-auto pb-px no-scrollbar text-xs sm:text-sm">
       <button id="tabBtn-timetable" onclick="switchTab('timetableTab')" class="px-3 py-2.5 font-extrabold border-b-2 border-brand-600 text-brand-600 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
         <i data-lucide="calendar-days" class="w-4 h-4"></i>
         <span>Batch 2 Timetable</span>
@@ -789,6 +830,20 @@
               <div>
                 <label class="block text-[11px] font-bold text-slate-700 mb-1">Message / Instructions *</label>
                 <textarea id="annContent" rows="3" placeholder="Provide syllabus, submission dates, or notes..." required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:outline-none resize-none"></textarea>
+              </div>
+
+              <div class="p-3 bg-brand-50/60 rounded-2xl border border-brand-100 space-y-2">
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Send To *</label>
+                <select id="annRecipientMode" onchange="updateAnnouncementRecipientPicker()" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-bold focus:outline-none">
+                  <option value="send-fa">Send to FA</option>
+                  <option value="all-crs">All CRs</option>
+                  <option value="particular-cr">Particular CR</option>
+                  <option value="particular-student">Particular Student</option>
+                  <option value="all-students">All Students Of Section</option>
+                </select>
+                <input type="text" id="annRecipientSearch" list="annRecipientOptions" placeholder="Search assigned recipient by Reg No. or name" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-medium focus:outline-none" />
+                <datalist id="annRecipientOptions"></datalist>
+                <p id="annRecipientHelp" class="text-[10px] text-slate-500">Select a recipient type to send this message or document.</p>
               </div>
 
               <!-- Cloudinary Official Upload Trigger -->
@@ -1465,6 +1520,7 @@
       activeDayOrder = val;
       saveStorage('edup_mechd_global_day_v11', activeDayOrder);
       updateIndianStandardTime();
+      renderTimetable();
       showToast(`Global Day Order updated to ${activeDayOrder} by ${currentUser.name}`, 'success');
     }
 
@@ -1489,6 +1545,17 @@
       const nextTiming = document.getElementById('liveNextSlotTiming');
 
       if (!liveName) return;
+
+      if (dayName === 'Holiday') {
+        liveName.textContent = 'Holiday';
+        liveMeta.textContent = 'No classes scheduled today';
+        liveTiming.textContent = 'All Day';
+        liveStatusTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Holiday`;
+        nextName.textContent = 'Campus holiday';
+        nextMeta.textContent = 'Check the next Day Order for classes';
+        nextTiming.textContent = '--';
+        return;
+      }
 
       const todaySchedule = timetable.find(t => t.day === dayName);
       if (!todaySchedule) return;
@@ -1875,6 +1942,7 @@
       document.getElementById('courseLocationEditorCard').classList.toggle('hidden', !isStaff);
       document.getElementById('thCourseActionCol').classList.toggle('hidden', !isStaff);
       document.getElementById('announcementPostCard').classList.toggle('hidden', !isStaff);
+      updateAnnouncementRecipientPicker();
 
       // Lock/Unlock the Global Day Order dropdown depending on authorization
       const dayOrderSelect = document.getElementById('activeDayOrderSelect');
@@ -2395,6 +2463,7 @@
       container.innerHTML = '';
 
       const filtered = announcements.filter((item) => {
+        if (!isAnnouncementVisibleToCurrentUser(item)) return false;
         if (currentAnnouncementFilter !== 'ALL' && item.category !== currentAnnouncementFilter) return false;
         if (searchKey) {
           const m1 = item.subject.toLowerCase().includes(searchKey);
@@ -2490,6 +2559,134 @@
       lucide.createIcons();
     }
 
+    function getAssignedAnnouncementRecipients() {
+      if (!currentUser) return [];
+      if (currentUser.role === 'fa') {
+        return Object.values(STAFF_ACCOUNTS).filter(account => account.role === 'cr');
+      }
+      if (currentUser.role === 'cr') {
+        return studentList.filter(student => student.stream === currentUser.stream);
+      }
+      return [];
+    }
+
+    function getRecipientIdentity(recipient) {
+      return recipient.role === 'cr' || recipient.role === 'fa' ? recipient.email : `student:${recipient.roll}`;
+    }
+
+    function getRecipientSearchValues(recipient) {
+      return [
+        recipient.name,
+        recipient.regNo,
+        recipient.rollNo,
+        recipient.roll,
+        recipient.email
+      ].filter(Boolean).map(value => value.toLowerCase());
+    }
+
+    function findAnnouncementRecipient(searchValue, recipients) {
+      const normalized = searchValue.trim().toLowerCase();
+      if (!normalized) return null;
+      return recipients.find(recipient => {
+        const values = getRecipientSearchValues(recipient);
+        if (values.includes(normalized)) return true;
+        const compactSearch = normalized.replace(/[^a-z0-9]/g, '');
+        const roll = String(recipient.roll || '').toLowerCase();
+        return Boolean(roll && compactSearch.endsWith(roll));
+      }) || null;
+    }
+
+    function isAnnouncementVisibleToCurrentUser(item) {
+      if (!currentUser || !item.audience || item.audience.mode === 'section') return true;
+      if (item.postedBy === currentUser.name) return true;
+      const identity = currentUser.role === 'cr' || currentUser.role === 'fa'
+        ? currentUser.email
+        : `student:${currentUser.rollNo.replace('#', '')}`;
+      if (item.audience.mode === 'assigned') return item.audience.role === currentUser.role;
+      return Array.isArray(item.audience.recipientIds) && item.audience.recipientIds.includes(identity);
+    }
+
+    function updateAnnouncementRecipientPicker() {
+      const mode = document.getElementById('annRecipientMode');
+      const search = document.getElementById('annRecipientSearch');
+      const options = document.getElementById('annRecipientOptions');
+      const help = document.getElementById('annRecipientHelp');
+      if (!mode || !search || !options || !help || !currentUser) return;
+
+      const allCRsOption = mode.querySelector('option[value="all-crs"]');
+      const particularCROption = mode.querySelector('option[value="particular-cr"]');
+      const sendFAOption = mode.querySelector('option[value="send-fa"]');
+      const isFA = currentUser.role === 'fa';
+      allCRsOption.disabled = false;
+      particularCROption.disabled = false;
+      sendFAOption.disabled = isFA;
+      if (isFA && mode.value === 'send-fa') {
+        mode.value = 'all-students';
+      }
+
+      const isFATarget = mode.value === 'send-fa';
+      const isCRTarget = mode.value === 'particular-cr';
+      const isStudentTarget = mode.value === 'particular-student';
+      const isSpecific = isFATarget || isCRTarget || isStudentTarget;
+      const recipients = isFATarget
+        ? [STAFF_ACCOUNTS['fa@gmail.com']]
+        : isCRTarget
+        ? Object.values(STAFF_ACCOUNTS).filter(account => account.role === 'cr')
+        : studentList;
+      options.innerHTML = recipients.map(recipient => {
+        const identifier = recipient.regNo || recipient.rollNo || recipient.roll;
+        return `<option value="${recipient.name} (${identifier})"></option>`;
+      }).join('');
+
+      search.classList.toggle('hidden', !isSpecific);
+      search.required = isSpecific;
+      if (mode.value === 'send-fa') {
+        help.textContent = 'Send this message or document directly to the Faculty Adviser.';
+      } else if (mode.value === 'all-crs') {
+        help.textContent = isFA ? 'FA messages go to all assigned CRs.' : 'CR messages go to all CRs.';
+      } else if (mode.value === 'particular-cr') {
+        help.textContent = 'Choose a CR from the complete CR list by Reg No. or name.';
+      } else if (mode.value === 'particular-student') {
+        help.textContent = 'Choose a student from the complete student list by Reg No. or name.';
+      } else {
+        help.textContent = currentUser.role === 'cr'
+          ? `CR messages go to all students assigned to ${currentUser.stream}.`
+          : 'FA messages go to all students in Section D.';
+      }
+    }
+
+    function buildAnnouncementAudience() {
+      const mode = document.getElementById('annRecipientMode').value;
+      if (mode === 'send-fa') {
+        return {
+          mode: 'specific',
+          role: 'fa',
+          recipientIds: [STAFF_ACCOUNTS['fa@gmail.com'].email],
+          recipientLabel: STAFF_ACCOUNTS['fa@gmail.com'].name
+        };
+      }
+      if (mode === 'all-students') {
+        return { mode: 'section' };
+      }
+      if (mode === 'all-crs') return { mode: 'assigned', role: 'cr' };
+
+      const recipients = mode === 'particular-cr'
+        ? Object.values(STAFF_ACCOUNTS).filter(account => account.role === 'cr')
+        : studentList;
+
+      const recipient = findAnnouncementRecipient(document.getElementById('annRecipientSearch').value, recipients);
+      if (!recipient) {
+        showToast('Choose an assigned recipient by selecting their exact name or Reg No.', 'error');
+        return null;
+      }
+      return {
+        mode: 'specific',
+        role: mode === 'particular-cr' ? 'cr' : 'student',
+        recipientIds: [getRecipientIdentity(recipient)],
+        recipientLabel: recipient.name
+      };
+    }
+
     function postNewAnnouncement(e) {
       e.preventDefault();
       if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) return;
@@ -2500,6 +2697,8 @@
       const content = document.getElementById('annContent').value.trim();
       const fileUrl = document.getElementById('attachedFileCdnUrl').value;
       const fileName = document.getElementById('attachedFileName').value;
+      const audience = buildAnnouncementAudience();
+      if (!audience) return;
 
       const newPost = {
         id: 'ann-' + Date.now(),
@@ -2510,7 +2709,8 @@
         fileName: fileName || null,
         fileUrl: fileUrl || null,
         postedBy: currentUser.name,
-        postedAt: new Date().toISOString()
+        postedAt: new Date().toISOString(),
+        audience
       };
 
       announcements.unshift(newPost);
@@ -2520,16 +2720,19 @@
       document.getElementById('annSubject').value = '';
       document.getElementById('annTeacher').value = '';
       document.getElementById('annContent').value = '';
+      document.getElementById('annRecipientMode').value = currentUser.role === 'fa' ? 'all-crs' : 'send-fa';
+      document.getElementById('annRecipientSearch').value = '';
       document.getElementById('attachedFileCdnUrl').value = '';
       document.getElementById('attachedFileName').value = '';
 
       const label = document.getElementById('cloudinaryFileLabel');
       label.textContent = 'No file attached';
       label.className = 'text-xs text-slate-400 italic truncate max-w-[150px]';
+      updateAnnouncementRecipientPicker();
 
       document.getElementById('tabBadgeUpdates').textContent = announcements.length;
       renderAnnouncements();
-      showToast('Update & document published for all students!', 'success');
+      showToast('Message and document sent to the selected recipients.', 'success');
     }
 
     function removeAnnouncement(id) {
