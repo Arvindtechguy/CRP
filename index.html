@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Classroom & Grievance Portal - Mech Sec D</title>
+  <title>Classroom &amp; Grievance Portal - Mech Sec D</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Fonts: Inter & JetBrains Mono for IST Clock -->
@@ -57,12 +57,12 @@
     ::-webkit-scrollbar-track { background: #f8fafc; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    
+
     .modal-backdrop {
       background-color: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(4px);
     }
-    
+
     .pulsing-dot {
       animation: pulseGlow 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
@@ -70,7 +70,7 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.35; transform: scale(1.2); }
     }
-    
+
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -83,7 +83,7 @@
   <!-- Header Navigation -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-      
+
       <!-- Brand Logo -->
       <div class="flex items-center space-x-2 sm:space-x-3 truncate">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-brand-500/25 shrink-0">
@@ -94,7 +94,7 @@
             <span class="text-sm sm:text-base font-black text-slate-800 tracking-tight truncate">Classroom Portal</span>
             <span class="text-[9px] bg-brand-50 text-brand-700 px-1.5 py-0.2 rounded font-bold border border-brand-200 shrink-0">Mech Sec D</span>
           </div>
-          <p class="text-[10px] text-slate-500 hidden sm:block truncate">Batch 2 • Core & Robotics/Automation</p>
+          <p class="text-[10px] text-slate-500 hidden sm:block truncate">Batch 2 • Core &amp; Robotics/Automation</p>
         </div>
       </div>
 
@@ -142,7 +142,7 @@
   <!-- AUTHENTICATION SCREEN -->
   <section id="loginScreen" class="flex-1 flex items-center justify-center p-3 sm:p-6">
     <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-xl shadow-slate-200/80 p-5 sm:p-8 space-y-5">
-      
+
       <div class="text-center space-y-1.5">
         <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 border border-brand-100 shadow-xs mb-1">
           <i data-lucide="shield-check" class="w-6 h-6"></i>
@@ -159,7 +159,7 @@
         </button>
         <button id="btnAuthTabStaff" type="button" onclick="switchLoginMode('staff')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition">
           <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-          <span>CR & FA Login</span>
+          <span>CR &amp; FA Login</span>
         </button>
       </div>
 
@@ -171,7 +171,7 @@
             <span>Instant Student Access (Roll Number Only)</span>
           </div>
           <p class="text-slate-600 text-[11px] leading-relaxed">
-            Students enter the last 3 digits of your Register No. <strong>CRs must use the CR & FA Login tab</strong>[cite: 3].
+            Students enter the last 3 digits of your Register No. <strong>CRs must use the CR &amp; FA Login tab</strong>.
           </p>
         </div>
 
@@ -182,21 +182,21 @@
             </label>
             <div class="relative max-w-xs mx-auto">
               <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 font-mono text-sm font-bold">RA2611...</span>
-              <input 
-                type="text" 
-                id="studentRegInput" 
-                maxlength="3" 
-                placeholder="202" 
+              <input
+                type="text"
+                id="studentRegInput"
+                maxlength="3"
+                placeholder="202"
                 autofocus
-                required 
+                required
                 class="w-full pl-24 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-brand-500 focus:outline-none text-xl font-mono font-black tracking-widest text-slate-800 text-center shadow-xs transition"
               />
             </div>
             <p id="studentAuthError" class="text-[11px] text-rose-600 font-bold mt-2 text-center hidden"></p>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white text-sm font-extrabold rounded-2xl shadow-md shadow-brand-500/25 transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Enter as Student</span>
@@ -210,10 +210,10 @@
         <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 space-y-1">
           <div class="font-black flex items-center gap-1.5 text-amber-800">
             <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600"></i>
-            <span>Authorized Management Accounts (CR & FA)</span>
+            <span>Authorized Management Accounts (CR &amp; FA)</span>
           </div>
           <p class="text-slate-600 text-[11px] leading-relaxed">
-            All 5 Class Representatives and Faculty Advisers log in here using Gmail and password[cite: 3].
+            All 5 Class Representatives and Faculty Advisers log in here using Gmail and password.
           </p>
         </div>
 
@@ -224,11 +224,11 @@
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                 <i data-lucide="mail" class="w-4 h-4"></i>
               </span>
-              <input 
-                type="email" 
-                id="staffEmailInput" 
-                placeholder="arvind.cr@gmail.com" 
-                required 
+              <input
+                type="email"
+                id="staffEmailInput"
+                placeholder="arvind.cr@gmail.com"
+                required
                 class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs font-medium"
               />
             </div>
@@ -240,16 +240,16 @@
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                 <i data-lucide="lock" class="w-4 h-4"></i>
               </span>
-              <input 
-                type="password" 
-                id="staffPasswordInput" 
-                placeholder="••••••••" 
-                required 
+              <input
+                type="password"
+                id="staffPasswordInput"
+                placeholder="••••••••"
+                required
                 class="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs font-medium"
               />
-              <button 
-                type="button" 
-                onclick="toggleStaffPasswordVisibility()" 
+              <button
+                type="button"
+                onclick="toggleStaffPasswordVisibility()"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
               >
                 <i id="staffEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
@@ -262,8 +262,8 @@
             <span id="staffLoginErrorText">Invalid credentials entered.</span>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="w-full py-3 px-4 bg-slate-900 hover:bg-black active:scale-[0.99] text-white text-sm font-extrabold rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Log In as CR / FA</span>
@@ -275,19 +275,19 @@
           <div class="font-bold text-slate-700">Quick Fill Accounts:</div>
           <div class="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
             <button type="button" onclick="fillStaffHelper('arvind.cr@gmail.com', 'cr009')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Arvind M R</span> (cr009)[cite: 3]
+              <span class="font-bold text-slate-800">Arvind M R</span> (cr009)
             </button>
             <button type="button" onclick="fillStaffHelper('akash.cr@gmail.com', 'cr005')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Akash Roy</span> (cr005)[cite: 3]
+              <span class="font-bold text-slate-800">Akash Roy</span> (cr005)
             </button>
             <button type="button" onclick="fillStaffHelper('abhijith.cr@gmail.com', 'cr238')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Abhijith V</span> (cr238)[cite: 3]
+              <span class="font-bold text-slate-800">Abhijith V</span> (cr238)
             </button>
             <button type="button" onclick="fillStaffHelper('muneer.cr@gmail.com', 'cr204')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">M. Muneer</span> (cr204)[cite: 3]
+              <span class="font-bold text-slate-800">M. Muneer</span> (cr204)
             </button>
             <button type="button" onclick="fillStaffHelper('rushali.cr@gmail.com', 'cr210')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Rushali V</span> (cr210)[cite: 3]
+              <span class="font-bold text-slate-800">Rushali V</span> (cr210)
             </button>
             <button type="button" onclick="fillStaffHelper('fa@gmail.com', 'fa123')" class="text-left bg-purple-50 p-1 rounded border border-purple-200 hover:bg-purple-100 truncate">
               <span class="font-bold text-purple-900">Faculty Adviser</span> (fa123)
@@ -307,7 +307,7 @@
       <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center relative z-10">
-        
+
         <div class="lg:col-span-6 space-y-2.5">
           <div class="flex items-center gap-2 flex-wrap">
             <span id="userRoleBadge" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-brand-500/30 text-brand-300 border border-brand-400/40">
@@ -329,7 +329,7 @@
               <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
               <span id="liveIstTime" class="font-mono font-extrabold text-emerald-400 text-xs sm:text-sm">--:--:-- AM IST</span>
             </div>
-            
+
             <!-- Global Day Order Control -->
             <div class="flex items-center gap-1 bg-slate-800/90 px-2.5 py-1.5 rounded-xl border border-slate-700/80 text-xs">
               <label for="activeDayOrderSelect" class="text-slate-400 font-bold text-[10px] sm:text-[11px]">Today's Day Order:</label>
@@ -384,7 +384,7 @@
 
       <button id="tabBtn-courseDirectory" onclick="switchTab('courseDirectoryTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
         <i data-lucide="map-pin" class="w-4 h-4"></i>
-        <span>Venues & Slots</span>
+        <span>Venues &amp; Slots</span>
       </button>
 
       <!-- Student Management Tab: STRICTLY CR & FA ONLY -->
@@ -402,7 +402,7 @@
 
       <button id="tabBtn-announcements" onclick="switchTab('announcementsTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
         <i data-lucide="file-text" class="w-4 h-4"></i>
-        <span>Updates & Notes</span>
+        <span>Updates &amp; Notes</span>
         <span id="tabBadgeUpdates" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-slate-200 text-slate-700 font-extrabold">0</span>
       </button>
 
@@ -428,7 +428,7 @@
               <span>Official Batch 2 Master Schedule</span>
               <span class="text-xs font-bold text-slate-400">(Day 1 - Day 5)</span>
             </h3>
-            <p class="text-[11px] text-slate-500">10 academic periods per Day Order[cite: 2]. <strong>Tap any period</strong> to open its faculty, room & venue popup.</p>
+            <p class="text-[11px] text-slate-500">10 academic periods per Day Order. <strong>Tap any period</strong> to open its faculty, room &amp; venue popup.</p>
           </div>
           <div id="ttRoleActionBadge"></div>
         </div>
@@ -460,7 +460,7 @@
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
               <i data-lucide="edit-3" class="w-3.5 h-3.5 text-brand-600"></i>
-              <span>Batch 2 Day Order Editor (CR & FA Authority)</span>
+              <span>Batch 2 Day Order Editor (CR &amp; FA Authority)</span>
             </h4>
             <span class="text-[10px] text-slate-400">Changes persist for all</span>
           </div>
@@ -502,18 +502,18 @@
 
     <!-- TAB 2: VENUES & LOCATION DIRECTORY -->
     <div id="courseDirectoryTab" class="hidden space-y-5">
-      
+
       <!-- Location Editor (CR & FA ONLY) -->
       <div id="courseLocationEditorCard" class="hidden bg-white rounded-3xl border border-brand-200 p-4 sm:p-6 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <div>
             <h3 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-1.5">
               <i data-lucide="map-pin" class="w-4 h-4 text-brand-600"></i>
-              <span>Course Location, Venue & Slot Editor</span>
+              <span>Course Location, Venue &amp; Slot Editor</span>
             </h3>
             <p class="text-[11px] text-slate-500">Edit classrooms, buildings, slots, and faculty assignments.</p>
           </div>
-          <span class="px-2 py-0.5 bg-brand-50 text-brand-700 text-[10px] font-extrabold rounded-lg border border-brand-200">CR & FA Authority</span>
+          <span class="px-2 py-0.5 bg-brand-50 text-brand-700 text-[10px] font-extrabold rounded-lg border border-brand-200">CR &amp; FA Authority</span>
         </div>
 
         <form onsubmit="handleSaveCourseLocation(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-brand-50/30 p-3 sm:p-4 rounded-2xl border border-brand-100">
@@ -538,7 +538,7 @@
             <input type="text" id="editCourseFaculty" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
           </div>
           <div class="sm:col-span-4">
-            <label class="block text-[11px] font-bold text-slate-700 mb-1">Building & Floor</label>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Building &amp; Floor</label>
             <input type="text" id="editCourseBuilding" required class="w-full p-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
           </div>
           <div class="sm:col-span-4">
@@ -549,7 +549,7 @@
           <div class="sm:col-span-12 flex justify-end pt-1">
             <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
               <i data-lucide="save" class="w-3.5 h-3.5"></i>
-              <span>Save Course & Venue</span>
+              <span>Save Course &amp; Venue</span>
             </button>
           </div>
         </form>
@@ -559,7 +559,7 @@
       <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <div>
-            <h3 class="text-sm sm:text-base font-black text-slate-800">Course Location & Slot Directory</h3>
+            <h3 class="text-sm sm:text-base font-black text-slate-800">Course Location &amp; Slot Directory</h3>
             <p class="text-[11px] text-slate-500">Instructor allocation, room locations, and credit structure.</p>
           </div>
           <span id="courseCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700">7 Courses</span>
@@ -574,7 +574,7 @@
                 <th class="py-2.5 px-2 text-center">Credit</th>
                 <th class="py-2.5 px-2 text-center">Slot</th>
                 <th class="py-2.5 px-3">Faculty</th>
-                <th class="py-2.5 px-3">Building & Floor</th>
+                <th class="py-2.5 px-3">Building &amp; Floor</th>
                 <th class="py-2.5 px-3">Room / Lab</th>
                 <th id="thCourseActionCol" class="py-2.5 px-3 text-right hidden">Action</th>
               </tr>
@@ -588,7 +588,7 @@
 
     <!-- TAB 3: STUDENT MANAGEMENT (CR & FA RESTRICTED ONLY) -->
     <div id="studentManageTab" class="hidden space-y-5">
-      
+
       <div class="bg-white rounded-3xl border border-brand-200 p-4 sm:p-6 shadow-xs space-y-4">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
@@ -608,25 +608,25 @@
             <label class="block text-[11px] font-bold text-slate-700 mb-1">3-Digit Roll Number *</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-mono text-xs font-bold">#</span>
-              <input 
-                type="text" 
-                id="newStudentRoll" 
-                maxlength="3" 
-                placeholder="257" 
-                required 
-                class="w-full pl-7 pr-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" 
+              <input
+                type="text"
+                id="newStudentRoll"
+                maxlength="3"
+                placeholder="257"
+                required
+                class="w-full pl-7 pr-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div class="sm:col-span-5">
             <label class="block text-[11px] font-bold text-slate-700 mb-1">Student Full Name *</label>
-            <input 
-              type="text" 
-              id="newStudentName" 
-              placeholder="e.g. S. HARISH KUMAR" 
-              required 
-              class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase" 
+            <input
+              type="text"
+              id="newStudentName"
+              placeholder="e.g. S. HARISH KUMAR"
+              required
+              class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase"
             />
           </div>
 
@@ -634,14 +634,14 @@
             <label class="block text-[11px] font-bold text-slate-700 mb-1">Branch / Stream *</label>
             <select id="newStudentStream" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
               <option value="Core">Mechanical Core</option>
-              <option value="R&A">Robotics & Automation</option>
+              <option value="R&A">Robotics &amp; Automation</option>
             </select>
           </div>
 
           <div class="sm:col-span-12 flex justify-end pt-1">
             <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
               <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-              <span>Register & Activate Student Login</span>
+              <span>Register &amp; Activate Student Login</span>
             </button>
           </div>
         </form>
@@ -652,19 +652,19 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
           <div>
             <h3 class="text-sm sm:text-base font-black text-slate-800">Class Section D Roster</h3>
-            <p class="text-[11px] text-slate-500">Live roster of all registered students with portal access credentials.</p>
+            <p class="text-[11px] text-slate-500">Live roster of all Class Representatives and registered students with portal access credentials.</p>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="downloadStudentRosterPdf()" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Download student roster as PDF">
+            <button type="button" onclick="downloadStudentRosterPdf()" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Download roster as PDF">
               <i data-lucide="file-down" class="w-3.5 h-3.5"></i>
               <span class="hidden sm:inline">Download PDF</span>
             </button>
-            <input 
-              type="text" 
-              id="studentSearchInput" 
-              oninput="renderStudentManagementList()" 
-              placeholder="Search by name or roll..." 
-              class="px-2.5 py-1 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand-500" 
+            <input
+              type="text"
+              id="studentSearchInput"
+              oninput="renderStudentManagementList()"
+              placeholder="Search by name or roll..."
+              class="px-2.5 py-1 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
             <span id="totalStudentsCountBadge" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-700 whitespace-nowrap">0 Students</span>
           </div>
@@ -676,7 +676,7 @@
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
                 <th class="py-2.5 px-3">Roll No.</th>
                 <th class="py-2.5 px-3">Registration No.</th>
-                <th class="py-2.5 px-3">Student Name</th>
+                <th class="py-2.5 px-3">Name</th>
                 <th class="py-2.5 px-3">Stream</th>
                 <th class="py-2.5 px-3">Login Credentials</th>
                 <th class="py-2.5 px-3 text-right">Actions</th>
@@ -760,7 +760,7 @@
 
       <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-          <h3 class="text-sm sm:text-base font-black text-slate-800">Active Overrides & Cancellations</h3>
+          <h3 class="text-sm sm:text-base font-black text-slate-800">Active Overrides &amp; Cancellations</h3>
           <span id="activeOverridesCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700">0 Active</span>
         </div>
         <div id="cancellationsList" class="space-y-2.5"></div>
@@ -775,7 +775,7 @@
             <div>
               <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
                 <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-600"></i>
-                <span>Publish Notes & Updates</span>
+                <span>Publish Notes &amp; Updates</span>
               </h3>
               <p class="text-[11px] text-slate-500">Post study materials or announcements stored on Cloudinary.</p>
             </div>
@@ -794,7 +794,7 @@
                 <div>
                   <label class="block text-[11px] font-bold text-slate-700 mb-1">Category *</label>
                   <select id="annCategory" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none">
-                    <option value="Notes">Study Notes & Lab</option>
+                    <option value="Notes">Study Notes &amp; Lab</option>
                     <option value="Exam">Exam / Assignment</option>
                     <option value="Cancellation">Class Cancellation</option>
                     <option value="Circular">Notice / Circular</option>
@@ -826,11 +826,11 @@
                   <span class="flex items-center gap-1.5"><i data-lucide="cloud" class="w-3.5 h-3.5 text-indigo-600"></i><span>Cloudinary Cloud Storage</span></span>
                   <span class="text-[9px] text-slate-400 font-normal">Optional</span>
                 </label>
-                
+
                 <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    onclick="openCloudinaryWidget()" 
+                  <button
+                    type="button"
+                    onclick="openCloudinaryWidget()"
                     class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                   >
                     <i data-lucide="upload" class="w-3.5 h-3.5"></i>
@@ -841,13 +841,13 @@
 
                 <input type="hidden" id="attachedFileCdnUrl" />
                 <input type="hidden" id="attachedFileName" />
-                
+
                 <p class="text-[10px] text-slate-400">PDFs, Word documents, PPTs, or images uploaded to Cloudinary CDN are shared only with the selected recipients.</p>
               </div>
 
               <button type="submit" class="w-full py-2.5 text-xs font-extrabold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
                 <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                <span>Publish Update & Document</span>
+                <span>Publish Update &amp; Document</span>
               </button>
             </form>
           </div>
@@ -857,7 +857,7 @@
           <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
               <div>
-                <h3 class="text-sm sm:text-base font-black text-slate-800">Section D Updates & Notes Feed</h3>
+                <h3 class="text-sm sm:text-base font-black text-slate-800">Section D Updates &amp; Notes Feed</h3>
                 <p class="text-[11px] text-slate-500">Messages and documents addressed to your account appear here.</p>
               </div>
 
@@ -884,7 +884,7 @@
     <!-- TAB 6: GRIEVANCES DESK -->
     <div id="grievanceTab" class="hidden space-y-5">
       <div class="flex items-center justify-between gap-3 px-1">
-        <p class="text-[11px] text-slate-500">Grievances update live when cloud sync is connected.</p>
+        <p class="text-[11px] text-slate-500">Every grievance is routed to all Class Representatives, regardless of stream.</p>
         <span id="firebaseSyncStatus" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 whitespace-nowrap">Local-only</span>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -910,7 +910,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-sm sm:text-base font-black text-slate-800">Lodge Grievance or Request</h3>
-            <p class="text-[11px] text-slate-500">Addressed to Section CRs and Faculty Adviser.</p>
+            <p class="text-[11px] text-slate-500">Addressed to all Section CRs and the Faculty Adviser.</p>
           </div>
           <button onclick="toggleGrievanceForm()" id="btnToggleGrievanceForm" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold rounded-xl border border-brand-200 transition flex items-center gap-1 cursor-pointer">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
@@ -923,9 +923,9 @@
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-1">Issue Category *</label>
               <select id="grvCategory" required class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none">
-                <option value="Academics">Academics & Coursework</option>
-                <option value="Facilities">Classroom & Lab Facilities</option>
-                <option value="Timetable">Timetable, Periods & Lab Clashes</option>
+                <option value="Academics">Academics &amp; Coursework</option>
+                <option value="Facilities">Classroom &amp; Lab Facilities</option>
+                <option value="Timetable">Timetable, Periods &amp; Lab Clashes</option>
                 <option value="General">General / Peer Issues</option>
               </select>
             </div>
@@ -969,7 +969,7 @@
     <div id="todosTab" class="hidden space-y-5">
       <div class="bg-gradient-to-r from-brand-700 to-indigo-800 rounded-3xl p-4 sm:p-6 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-brand-200"></i><h3 class="text-base sm:text-lg font-black">My To-Dos & Reminders</h3></div>
+          <div class="flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-brand-200"></i><h3 class="text-base sm:text-lg font-black">My To-Dos &amp; Reminders</h3></div>
           <p class="text-[11px] text-brand-100 mt-1">Your tasks are private to your portal account and saved on this device.</p>
         </div>
         <button type="button" onclick="enableTodoNotifications()" class="px-3 py-2 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 border border-white/25 transition flex items-center justify-center gap-1.5 cursor-pointer">
@@ -996,7 +996,7 @@
             <div><label for="todoTitle" class="block text-[11px] font-bold text-slate-700 mb-1">Task *</label><input id="todoTitle" required maxlength="120" placeholder="e.g. Finish lab record" class="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500" /></div>
             <div><label for="todoNotes" class="block text-[11px] font-bold text-slate-700 mb-1">Notes</label><textarea id="todoNotes" rows="2" maxlength="500" placeholder="Optional details" class="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea></div>
             <div class="grid grid-cols-2 gap-3">
-              <div><label for="todoDueAt" class="block text-[11px] font-bold text-slate-700 mb-1">Due date & time</label><input id="todoDueAt" type="datetime-local" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" /></div>
+              <div><label for="todoDueAt" class="block text-[11px] font-bold text-slate-700 mb-1">Due date &amp; time</label><input id="todoDueAt" type="datetime-local" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" /></div>
               <div><label for="todoPriority" class="block text-[11px] font-bold text-slate-700 mb-1">Priority</label><select id="todoPriority" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select></div>
             </div>
             <div><label for="todoReminderMinutes" class="block text-[11px] font-bold text-slate-700 mb-1">Reminder</label><select id="todoReminderMinutes" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none"><option value="">No reminder</option><option value="0">At due time</option><option value="15">15 minutes before</option><option value="60">1 hour before</option><option value="1440">1 day before</option></select></div>
@@ -1041,7 +1041,7 @@
             <div id="popupRoom" class="font-mono font-black text-slate-800 text-xs sm:text-sm mt-0.5">Room 000</div>
           </div>
           <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
-            <span class="text-[9px] font-bold uppercase text-slate-400">Credit & Slot</span>
+            <span class="text-[9px] font-bold uppercase text-slate-400">Credit &amp; Slot</span>
             <div id="popupCreditSlot" class="font-mono font-bold text-slate-800 text-xs sm:text-sm mt-0.5">-- Credits</div>
           </div>
         </div>
@@ -1052,7 +1052,7 @@
       </div>
 
       <div class="pt-1 space-y-2">
-        <button id="popupVenueEditButton" onclick="editCourseVenueFromModal()" class="hidden w-full py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold rounded-xl transition cursor-pointer">Edit Venue & Slot</button>
+        <button id="popupVenueEditButton" onclick="editCourseVenueFromModal()" class="hidden w-full py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold rounded-xl transition cursor-pointer">Edit Venue &amp; Slot</button>
         <button onclick="closeCourseInfoModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition cursor-pointer">Close</button>
       </div>
     </div>
@@ -1137,11 +1137,11 @@
             const info = result.info;
             document.getElementById('attachedFileCdnUrl').value = info.secure_url;
             document.getElementById('attachedFileName').value = info.original_filename + '.' + info.format;
-            
+
             const label = document.getElementById('cloudinaryFileLabel');
             label.textContent = `${info.original_filename}.${info.format}`;
             label.className = 'text-xs text-emerald-600 font-bold truncate max-w-[150px]';
-            
+
             showToast(`Uploaded to Cloudinary: ${info.original_filename}`, 'success');
           }
         });
@@ -1496,25 +1496,25 @@
 
     // --- 3. BATCH 2 TIMETABLE ---
     const DEFAULT_TIMETABLE = [
-      { 
-        day: 'Day 1', 
-        periods: ['26MEE1002L', '26MEE1002L', '26MEE1002L', '26MEE1002L', '-', '-', '-', '-', '-', '26LCA1001J'] 
+      {
+        day: 'Day 1',
+        periods: ['26MEE1002L', '26MEE1002L', '26MEE1002L', '26MEE1002L', '-', '-', '-', '-', '-', '26LCA1001J']
       },
-      { 
-        day: 'Day 2', 
-        periods: ['26PYB1002J', '26PYB1002J', '26LCA1001J', '26LCA1001J', '-', '-', '-', '-', '-', '-'] 
+      {
+        day: 'Day 2',
+        periods: ['26PYB1002J', '26PYB1002J', '26LCA1001J', '26LCA1001J', '-', '-', '-', '-', '-', '-']
       },
-      { 
-        day: 'Day 3', 
-        periods: ['-', '-', '-', '-', '-', '26EEE1001T', '26EEE1001T', '-', '26MAB1001T', '-'] 
+      {
+        day: 'Day 3',
+        periods: ['-', '-', '-', '-', '-', '26EEE1001T', '26EEE1001T', '-', '26MAB1001T', '-']
       },
-      { 
-        day: 'Day 4', 
-        periods: ['26MAB1001T', '26MAB1001T', '26PYB1002J', '26CSE1001T', '26LCA1001J', '-', '-', '-', '-', '-'] 
+      {
+        day: 'Day 4',
+        periods: ['26MAB1001T', '26MAB1001T', '26PYB1002J', '26CSE1001T', '26LCA1001J', '-', '-', '-', '-', '-']
       },
-      { 
-        day: 'Day 5', 
-        periods: ['26PYB1002J', '26PYB1002J', '-', '-', '-', '26CSE1001T', '26CSE1001T', '26EEE1001T', '-', '26MAB1001T'] 
+      {
+        day: 'Day 5',
+        periods: ['26PYB1002J', '26PYB1002J', '-', '-', '-', '26CSE1001T', '26CSE1001T', '26EEE1001T', '-', '26MAB1001T']
       }
     ];
 
@@ -1689,7 +1689,7 @@
     let editingTodoId = null;
     let classReminderSettings = { enabled: false, leadMinutes: 10, notified: {} };
     let activeDayOrder = loadStorage('edup_mechd_global_day_v11', 'Day 5');
-    
+
     let currentTab = 'timetableTab';
     let currentAnnouncementFilter = 'ALL';
     let isBannerDismissed = false;
@@ -1698,7 +1698,7 @@
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
-      
+
       const theme = {
         success: 'bg-emerald-600 text-white shadow-emerald-500/25',
         error: 'bg-rose-600 text-white shadow-rose-500/25',
@@ -1824,8 +1824,8 @@
           const override = getOverrideForSlot(dayName, slot.idx);
           if (override && override.statusType === 'CANCELLED') continue;
 
-          const rawSub = override && override.statusType === 'SUBSTITUTE' 
-            ? override.substituteSubject 
+          const rawSub = override && override.statusType === 'SUBSTITUTE'
+            ? override.substituteSubject
             : todaySchedule.periods[slot.idx];
 
           if (rawSub && rawSub.trim() !== '' && rawSub !== '-') {
@@ -1948,7 +1948,7 @@
         const primary = todayOverrides[0];
         const pSlot = PERIOD_SLOTS.find(p => p.idx === primary.periodIdx);
         const pLabel = pSlot ? pSlot.label : `Period ${primary.periodIdx + 1}`;
-        
+
         bannerText.textContent = `ALERT: ${dayName} ${pLabel} (${primary.originalSubject}) is marked as ${primary.statusType}! Reason: ${primary.reason}`;
         banner.classList.remove('hidden');
       } else {
@@ -2033,7 +2033,7 @@
       const rollNum = rawInput.padStart(3, '0').slice(-3);
 
       if (CR_ROLLS.includes(rollNum)) {
-        errEl.textContent = `Roll #${rollNum} is registered as a Class Representative. Please sign in via the 'CR & FA Login' tab above using your Gmail credentials.`;
+        errEl.textContent = `Roll #${rollNum} is registered as a Class Representative. Please sign in via the 'CR & FA Login' tab above using your credentials.`;
         errEl.classList.remove('hidden');
         return;
       }
@@ -2077,7 +2077,7 @@
         showToast(`Signed in: ${currentUser.name}`, 'success');
         refreshAppState();
       } else {
-        errText.textContent = 'Invalid Gmail or password entered.';
+        errText.textContent = 'Invalid Username or password entered.';
         errBox.classList.remove('hidden');
       }
     }
@@ -2185,7 +2185,7 @@
         roleBadge.textContent = `Student Desk (${currentUser.rollNo})`;
         roleBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-blue-500/30 text-blue-300 border border-blue-400/40";
         document.getElementById('studentGrievanceSubmitCard').classList.remove('hidden');
-        
+
         // Hide student management tab completely from students
         studentManageBtn.classList.add('hidden');
         studentManageBtn.classList.remove('flex');
@@ -2303,6 +2303,10 @@
         showToast('Unauthorized action.', 'error');
         return;
       }
+      if (CR_ROLLS.includes(roll)) {
+        showToast('Class Representative accounts are protected and cannot be removed here.', 'warning');
+        return;
+      }
       if (!confirm(`Are you sure you want to revoke login access for Student #${roll}?`)) return;
 
       studentList = studentList.filter(s => s.roll !== roll);
@@ -2310,6 +2314,30 @@
       document.getElementById('tabBadgeStudentCount').textContent = studentList.length;
       renderStudentManagementList();
       showToast(`Access revoked for Student #${roll}.`, 'info');
+    }
+
+    // Combined roster: Class Representatives first (protected), then students.
+    function getRosterEntries() {
+      const crEntries = Object.values(STAFF_ACCOUNTS)
+        .filter(account => account.role === 'cr')
+        .map(account => ({
+          roll: account.rollNo.replace('#', ''),
+          name: account.name,
+          stream: account.stream,
+          regNo: account.regNo,
+          isCr: true
+        }))
+        .sort((left, right) => left.roll.localeCompare(right.roll));
+
+      const studentEntries = studentList.map(student => ({
+        roll: student.roll,
+        name: student.name,
+        stream: student.stream,
+        regNo: getStudentRegistrationNo(student),
+        isCr: false
+      }));
+
+      return [...crEntries, ...studentEntries];
     }
 
     function renderStudentManagementList() {
@@ -2324,37 +2352,48 @@
         return;
       }
 
-      const filtered = studentList.filter(s => {
+      const entries = getRosterEntries();
+      const crCount = entries.filter(entry => entry.isCr).length;
+
+      const filtered = entries.filter(entry => {
         if (!searchKey) return true;
-        return s.name.toLowerCase().includes(searchKey) || s.roll.includes(searchKey) || s.stream.toLowerCase().includes(searchKey);
+        return entry.name.toLowerCase().includes(searchKey)
+          || entry.roll.includes(searchKey)
+          || entry.regNo.toLowerCase().includes(searchKey)
+          || entry.stream.toLowerCase().includes(searchKey);
       });
 
-      totalBadge.textContent = `${studentList.length} Students Total`;
+      totalBadge.textContent = `${studentList.length} Students • ${crCount} CRs`;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">No student profiles found matching your search.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">No profiles found matching your search.</td></tr>`;
         return;
       }
 
-      filtered.forEach(s => {
+      filtered.forEach(entry => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition-colors";
+        tr.className = entry.isCr ? "bg-emerald-50/40 hover:bg-emerald-50 transition-colors" : "hover:bg-slate-50 transition-colors";
         tr.innerHTML = `
-          <td class="py-2.5 px-3 font-mono font-bold text-slate-900">#${s.roll}</td>
-          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${getStudentRegistrationNo(s)}</td>
-          <td class="py-2.5 px-3 font-bold text-slate-800">${s.name}</td>
+          <td class="py-2.5 px-3 font-mono font-bold text-slate-900">#${entry.roll}</td>
+          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${entry.regNo}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-800">
+            ${entry.name}
+            ${entry.isCr ? `<span class="ml-1.5 inline-block px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 align-middle">CR</span>` : ''}
+          </td>
           <td class="py-2.5 px-3">
-            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold ${s.stream === 'Core' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}">
-              ${s.stream}
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold ${entry.stream === 'Core' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}">
+              ${entry.stream}
             </span>
           </td>
           <td class="py-2.5 px-3 font-mono text-[11px] text-slate-500">
-            Roll: <strong class="text-slate-800">${s.roll}</strong> (No password required)
+            ${entry.isCr
+              ? `Gmail + password (CR &amp; FA Login)`
+              : `Roll: <strong class="text-slate-800">${entry.roll}</strong> (No password required)`}
           </td>
           <td class="py-2.5 px-3 text-right">
-            <button onclick="removeStudent('${s.roll}')" class="text-xs text-slate-400 hover:text-rose-600 transition p-1 cursor-pointer" title="Remove student login">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
+            ${entry.isCr
+              ? `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400" title="Class Representative accounts are protected"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Protected</span></span>`
+              : `<button onclick="removeStudent('${entry.roll}')" class="text-xs text-slate-400 hover:text-rose-600 transition p-1 cursor-pointer" title="Remove student login"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`}
           </td>
         `;
         tbody.appendChild(tr);
@@ -2364,7 +2403,7 @@
 
     function downloadStudentRosterPdf() {
       if (!currentUser || (currentUser.role !== 'cr' && currentUser.role !== 'fa')) {
-        showToast('Only CRs and Faculty Advisers can download the student roster.', 'error');
+        showToast('Only CRs and Faculty Advisers can download the roster.', 'error');
         return;
       }
 
@@ -2374,6 +2413,7 @@
         return;
       }
 
+      const rosterEntries = getRosterEntries();
       const documentPdf = new jsPdfConstructor({ orientation: 'landscape', unit: 'mm', format: 'a4' });
       const pageWidth = documentPdf.internal.pageSize.getWidth();
       const pageHeight = documentPdf.internal.pageSize.getHeight();
@@ -2387,7 +2427,7 @@
         documentPdf.setTextColor(255, 255, 255);
         documentPdf.setFontSize(13);
         documentPdf.setFont(undefined, 'bold');
-        documentPdf.text('Classroom Portal - Section D Student Roster', leftMargin, 7.5);
+        documentPdf.text('Classroom Portal - Section D Roster (CRs & Students)', leftMargin, 7.5);
         documentPdf.setTextColor(15, 23, 42);
         documentPdf.setFontSize(8);
         documentPdf.setFont(undefined, 'normal');
@@ -2399,14 +2439,14 @@
         documentPdf.setFont(undefined, 'bold');
         documentPdf.text('Roll', leftMargin + 2, y);
         documentPdf.text('Registration No.', leftMargin + 20, y);
-        documentPdf.text('Student Name', leftMargin + 75, y);
+        documentPdf.text('Name', leftMargin + 75, y);
         documentPdf.text('Stream', pageWidth - leftMargin - 28, y);
         y += rowHeight;
       }
 
       drawHeader();
       documentPdf.setFontSize(8);
-      studentList.forEach((student, index) => {
+      rosterEntries.forEach((entry, index) => {
         if (y > pageHeight - 14) {
           documentPdf.addPage();
           drawHeader();
@@ -2416,30 +2456,32 @@
           documentPdf.rect(leftMargin, y - 5, pageWidth - (leftMargin * 2), rowHeight, 'F');
         }
         documentPdf.setTextColor(15, 23, 42);
-        documentPdf.setFont(undefined, 'normal');
-        documentPdf.text(`#${student.roll}`, leftMargin + 2, y);
-        documentPdf.text(getStudentRegistrationNo(student), leftMargin + 20, y);
-        documentPdf.text(student.name, leftMargin + 75, y);
-        documentPdf.text(student.stream, pageWidth - leftMargin - 28, y);
+        documentPdf.setFont(undefined, entry.isCr ? 'bold' : 'normal');
+        documentPdf.text(`#${entry.roll}`, leftMargin + 2, y);
+        documentPdf.text(entry.regNo, leftMargin + 20, y);
+        documentPdf.text(entry.name, leftMargin + 75, y);
+        documentPdf.text(`${entry.stream}${entry.isCr ? ' (CR)' : ''}`, pageWidth - leftMargin - 28, y);
         y += rowHeight;
       });
 
       documentPdf.setFontSize(8);
+      documentPdf.setFont(undefined, 'normal');
       documentPdf.setTextColor(71, 85, 105);
-      documentPdf.text(`Total students: ${studentList.length}`, leftMargin, pageHeight - 7);
-      documentPdf.save(`section-d-student-roster-${new Date().toISOString().slice(0, 10)}.pdf`);
-      showToast('Student roster PDF downloaded.', 'success');
+      documentPdf.text(`Total students: ${studentList.length} • Class Representatives: ${rosterEntries.filter(entry => entry.isCr).length}`, leftMargin, pageHeight - 7);
+      documentPdf.save(`section-d-roster-${new Date().toISOString().slice(0, 10)}.pdf`);
+      showToast('Roster PDF downloaded.', 'success');
     }
 
     function downloadStudentRosterPdfFallback() {
+      const rosterEntries = getRosterEntries();
       const escapePdfText = value => String(value).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
       const lines = [
-        'Classroom Portal - Section D Student Roster',
+        'Classroom Portal - Section D Roster (CRs & Students)',
         `Generated by ${currentUser.name} (${currentUser.role.toUpperCase()})`,
-        `Total students: ${studentList.length}`,
+        `Total students: ${studentList.length} | Class Representatives: ${rosterEntries.filter(entry => entry.isCr).length}`,
         '',
-        'Roll     Registration No.       Student Name                         Stream',
-        ...studentList.map(student => `#${student.roll.padEnd(7)} ${getStudentRegistrationNo(student).padEnd(24)} ${student.name.padEnd(38)} ${student.stream}`)
+        'Roll     Registration No.       Name                                 Stream',
+        ...rosterEntries.map(entry => `#${entry.roll.padEnd(7)} ${entry.regNo.padEnd(24)} ${entry.name.padEnd(38)} ${entry.stream}${entry.isCr ? ' (CR)' : ''}`)
       ];
       const pageLines = [];
       for (let index = 0; index < lines.length; index += 45) pageLines.push(lines.slice(index, index + 45));
@@ -2481,12 +2523,12 @@
       const blobUrl = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
       const downloadLink = document.createElement('a');
       downloadLink.href = blobUrl;
-      downloadLink.download = `section-d-student-roster-${new Date().toISOString().slice(0, 10)}.pdf`;
+      downloadLink.download = `section-d-roster-${new Date().toISOString().slice(0, 10)}.pdf`;
       document.body.appendChild(downloadLink);
       downloadLink.click();
       downloadLink.remove();
       URL.revokeObjectURL(blobUrl);
-      showToast('Student roster PDF downloaded.', 'success');
+      showToast('Roster PDF downloaded.', 'success');
     }
 
     // --- 10. VENUES & LOCATION DIRECTORY CONTROLLER ---
@@ -2627,12 +2669,12 @@
             const shortSubjectName = subjectName.length > 24 ? `${subjectName.slice(0, 24)}...` : subjectName;
             cols += `
               <td class="py-2 px-1 text-center">
-                <button 
-                  type="button" 
-                  data-day="${row.day}" 
-                  data-pidx="${pIdx}" 
+                <button
+                  type="button"
+                  data-day="${row.day}"
+                  data-pidx="${pIdx}"
                   data-code="${rawSubject}"
-                  class="course-slot-btn inline-block min-w-[82px] py-1 px-1.5 rounded-md bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-800 hover:text-brand-700 text-[10px] sm:text-[11px] font-mono font-bold shadow-2xs whitespace-nowrap transition cursor-pointer active:scale-95" 
+                  class="course-slot-btn inline-block min-w-[82px] py-1 px-1.5 rounded-md bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-800 hover:text-brand-700 text-[10px] sm:text-[11px] font-mono font-bold shadow-2xs whitespace-nowrap transition cursor-pointer active:scale-95"
                   title="Click for course venue and slot details"
                 >
                   <span class="block font-sans text-[9px] font-extrabold truncate" title="${subjectName}">${shortSubjectName}</span>
@@ -2870,7 +2912,7 @@
       ['ALL', 'Notes', 'Cancellation', 'Exam', 'Circular'].forEach(c => {
         const chip = document.getElementById(`filterChip-${c}`);
         if (chip) {
-          chip.className = c === category 
+          chip.className = c === category
             ? "px-2.5 py-1 rounded-lg bg-brand-600 text-white font-bold whitespace-nowrap cursor-pointer"
             : "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-medium whitespace-nowrap cursor-pointer";
         }
@@ -2915,7 +2957,7 @@
         item.className = "bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2 hover:border-slate-300 transition";
 
         const badgeClass = catBadges[ann.category] || 'bg-slate-100 text-slate-700 border-slate-200';
-        
+
         const formattedDate = new Intl.DateTimeFormat('en-IN', {
           timeZone: 'Asia/Kolkata',
           day: '2-digit',
@@ -3374,7 +3416,7 @@
       }
     }
 
-    // --- 15. GRIEVANCES CONTROLLER ---
+    // --- 16. GRIEVANCES CONTROLLER ---
     function getGrievanceStream(grievance) {
       if (grievance.stream) return grievance.stream;
       const student = studentList.find((item) => `student${item.roll}@portal.edu` === grievance.studentEmail);
@@ -3384,7 +3426,8 @@
     function canViewGrievance(grievance) {
       if (!currentUser) return false;
       if (currentUser.role === 'fa') return Boolean(grievance.forwardedByCrEmail) || grievance.status === 'Forwarded to FA' || Boolean(grievance.faResolution);
-      if (currentUser.role === 'cr') return getGrievanceStream(grievance) === currentUser.stream;
+      // Every Class Representative receives every grievance, Core and R&A alike.
+      if (currentUser.role === 'cr') return true;
       return currentUser.role === 'student' && grievance.studentEmail === currentUser.email;
     }
 
@@ -3436,6 +3479,8 @@
         studentRoll: currentUser.rollNo,
         isAnonymous: false,
         stream: currentUser.stream,
+        // Routed to every Class Representative, irrespective of stream.
+        notifiedCrEmails: Object.values(STAFF_ACCOUNTS).filter((account) => account.role === 'cr').map((account) => account.email),
         status: 'Submitted',
         submittedAt: new Date().toISOString(),
         crRemark: '',
@@ -3457,7 +3502,7 @@
       toggleGrievanceForm();
       document.getElementById('tabBadgeGrievances').textContent = grievances.filter(canViewGrievance).length;
       renderGrievanceList();
-      showToast('Grievance registered and routed for CR review.', 'success');
+      showToast('Grievance registered and sent to all Class Representatives.', 'success');
     }
 
     function renderGrievanceList() {
@@ -3692,7 +3737,7 @@
       renderGrievanceList();
     }
 
-    // --- 15. INITIALIZATION ---
+    // --- 17. INITIALIZATION ---
     window.addEventListener('DOMContentLoaded', () => {
       refreshAppState();
       initFirebaseGrievanceSync();
