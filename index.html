@@ -16,6 +16,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Cloudinary Official Upload Widget -->
   <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+  <!-- Firebase configuration: add your project values in firebase-config.js before publishing. -->
+  <script src="firebase-config.js"></script>
 <!-- PWA Manifest & App Icons -->
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#4f46e5" />
@@ -408,6 +410,12 @@
         <i data-lucide="message-square" class="w-4 h-4"></i>
         <span>Grievance Desk</span>
         <span id="tabBadgeGrievances" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-amber-100 text-amber-800 font-extrabold">0</span>
+      </button>
+
+      <button id="tabBtn-todos" onclick="switchTab('todosTab')" class="px-3 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0">
+        <i data-lucide="list-todo" class="w-4 h-4"></i>
+        <span>My To-Dos</span>
+        <span id="tabBadgeTodos" class="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-brand-100 text-brand-800 font-extrabold">0</span>
       </button>
     </div>
 
@@ -875,6 +883,10 @@
 
     <!-- TAB 6: GRIEVANCES DESK -->
     <div id="grievanceTab" class="hidden space-y-5">
+      <div class="flex items-center justify-between gap-3 px-1">
+        <p class="text-[11px] text-slate-500">Grievances update live when cloud sync is connected.</p>
+        <span id="firebaseSyncStatus" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 whitespace-nowrap">Local-only</span>
+      </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0"><i data-lucide="inbox" class="w-4 h-4"></i></div>
@@ -937,14 +949,6 @@
             <textarea id="grvDescription" rows="3" placeholder="Context, room number, or specifics..." required class="w-full p-2 bg-slate-50 rounded-xl border border-slate-300 text-xs focus:outline-none resize-none"></textarea>
           </div>
 
-          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-            <label for="grvAnonymous" class="flex items-center gap-2 cursor-pointer select-none">
-              <input type="checkbox" id="grvAnonymous" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500" />
-              <span class="text-xs font-bold text-slate-800">Submit Anonymously</span>
-            </label>
-            <span class="text-[11px] text-slate-400 flex items-center gap-1"><i data-lucide="shield" class="w-3.5 h-3.5 text-brand-600"></i><span>Privacy Guard</span></span>
-          </div>
-
           <div class="flex justify-end gap-2 pt-1">
             <button type="button" onclick="toggleGrievanceForm()" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl cursor-pointer">Cancel</button>
             <button type="submit" class="px-4 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>Submit</span></button>
@@ -958,6 +962,52 @@
           <input type="text" id="grvSearch" oninput="renderGrievanceList()" placeholder="Search..." class="px-2.5 py-1 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none" />
         </div>
         <div id="grievanceCardsContainer" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- TAB 7: PERSONAL TO-DOS & REMINDERS -->
+    <div id="todosTab" class="hidden space-y-5">
+      <div class="bg-gradient-to-r from-brand-700 to-indigo-800 rounded-3xl p-4 sm:p-6 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-brand-200"></i><h3 class="text-base sm:text-lg font-black">My To-Dos & Reminders</h3></div>
+          <p class="text-[11px] text-brand-100 mt-1">Your tasks are private to your portal account and saved on this device.</p>
+        </div>
+        <button type="button" onclick="enableTodoNotifications()" class="px-3 py-2 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 border border-white/25 transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i data-lucide="bell-ring" class="w-3.5 h-3.5"></i><span>Enable Browser Alerts</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-3 sm:p-4 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-brand-50 text-brand-700 border border-brand-100 flex items-center justify-center shrink-0"><i data-lucide="bell-ring" class="w-4 h-4"></i></div>
+          <div class="min-w-0 flex-1"><div class="text-[10px] uppercase tracking-wider font-black text-slate-400">Class Tracker</div><div id="classTrackerSummary" class="text-xs sm:text-sm font-black text-slate-800 truncate">Loading today's schedule…</div><div id="classTrackerSubtext" class="text-[10px] text-slate-500 truncate">Uses the active Day Order</div></div>
+          <button type="button" onclick="toggleClassTrackerDetails()" id="classTrackerCompactBtn" class="p-2 text-slate-400 hover:text-brand-700 rounded-lg hover:bg-brand-50 transition cursor-pointer" aria-label="Expand class tracker"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+        </div>
+        <div id="classTrackerDetails" class="hidden border-t border-slate-100 p-3 sm:p-4 bg-slate-50/70 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2"><p class="text-[11px] text-slate-600">Receive an alert before every scheduled class. Cancelled periods are skipped automatically.</p><div class="flex items-center gap-2"><label for="classReminderLead" class="text-[11px] font-bold text-slate-600 whitespace-nowrap">Alert</label><select id="classReminderLead" onchange="saveClassReminderLead()" class="p-1.5 rounded-lg border border-slate-300 bg-white text-[11px] font-bold focus:outline-none"><option value="5">5 min before</option><option value="10">10 min before</option><option value="15">15 min before</option></select><button type="button" onclick="toggleClassReminders()" id="classReminderToggle" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition cursor-pointer">Enable</button></div></div>
+          <div id="classTrackerSchedule" class="flex gap-2 overflow-x-auto no-scrollbar pb-0.5"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3">
+          <div><h4 id="todoFormHeading" class="text-sm font-black text-slate-800">Add a To-Do</h4><p class="text-[11px] text-slate-500">Set an optional due date and reminder.</p></div>
+          <form id="todoForm" onsubmit="submitTodo(event)" class="space-y-3">
+            <div><label for="todoTitle" class="block text-[11px] font-bold text-slate-700 mb-1">Task *</label><input id="todoTitle" required maxlength="120" placeholder="e.g. Finish lab record" class="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500" /></div>
+            <div><label for="todoNotes" class="block text-[11px] font-bold text-slate-700 mb-1">Notes</label><textarea id="todoNotes" rows="2" maxlength="500" placeholder="Optional details" class="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label for="todoDueAt" class="block text-[11px] font-bold text-slate-700 mb-1">Due date & time</label><input id="todoDueAt" type="datetime-local" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" /></div>
+              <div><label for="todoPriority" class="block text-[11px] font-bold text-slate-700 mb-1">Priority</label><select id="todoPriority" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select></div>
+            </div>
+            <div><label for="todoReminderMinutes" class="block text-[11px] font-bold text-slate-700 mb-1">Reminder</label><select id="todoReminderMinutes" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold focus:outline-none"><option value="">No reminder</option><option value="0">At due time</option><option value="15">15 minutes before</option><option value="60">1 hour before</option><option value="1440">1 day before</option></select></div>
+            <div class="flex justify-end gap-2 pt-1"><button id="cancelTodoEditBtn" type="button" onclick="cancelTodoEdit()" class="hidden px-3.5 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl cursor-pointer">Cancel</button><button id="todoSubmitBtn" type="submit" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition cursor-pointer">Add To-Do</button></div>
+          </form>
+        </div>
+
+        <div class="lg:col-span-3 bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2"><div><h4 class="text-sm font-black text-slate-800">Task List</h4><p id="todoSummary" class="text-[11px] text-slate-500">No active tasks</p></div><button type="button" onclick="clearCompletedTodos()" class="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition cursor-pointer">Clear completed</button></div>
+          <div id="todoList" class="space-y-2.5"></div>
+        </div>
       </div>
     </div>
 
@@ -1049,7 +1099,7 @@
             <select id="modalFaActionType" class="w-full p-2 rounded-xl bg-slate-50 border border-slate-300 text-xs font-bold">
               <option value="fa_resolve">Resolve Grievance (Official Faculty Resolution)</option>
               <option value="fa_close">Close (Unfeasible / Dismissed)</option>
-              <option value="fa_review">Mark Under Investigation</option>
+              <option value="fa_review">Mark Under Investigation by Faculty</option>
             </select>
           </div>
           <div>
@@ -1522,6 +1572,98 @@
       }
     }
 
+    // --- OPTIONAL FIREBASE CLOUD SYNC (GRIEVANCES) ---
+    // The portal remains usable locally until firebase-config.js is configured.
+    let firebaseDb = null;
+    let firebaseApi = null;
+    let unsubscribeGrievanceSync = null;
+    let firebaseGrievanceSyncActive = false;
+
+    function isFirebaseConfigured() {
+      const config = window.FIREBASE_CONFIG;
+      return Boolean(config && config.apiKey && config.projectId && !config.apiKey.startsWith('REPLACE_') && !config.projectId.startsWith('REPLACE_'));
+    }
+
+    function setFirebaseSyncStatus(label, type = 'local') {
+      const status = document.getElementById('firebaseSyncStatus');
+      if (!status) return;
+      const classes = {
+        local: 'bg-slate-100 text-slate-500 border-slate-200',
+        connecting: 'bg-amber-50 text-amber-700 border-amber-200',
+        live: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        error: 'bg-rose-50 text-rose-700 border-rose-200'
+      };
+      status.className = `text-[10px] font-bold px-2 py-1 rounded-lg border whitespace-nowrap ${classes[type] || classes.local}`;
+      status.textContent = label;
+    }
+
+    function refreshGrievanceUiFromCloud() {
+      if (!currentUser) return;
+      document.getElementById('tabBadgeGrievances').textContent = grievances.filter(canViewGrievance).length;
+      if (currentTab === 'grievanceTab') renderGrievanceList();
+    }
+
+    async function initFirebaseGrievanceSync() {
+      if (!isFirebaseConfigured()) {
+        setFirebaseSyncStatus('Local-only', 'local');
+        return;
+      }
+      try {
+        setFirebaseSyncStatus('Connecting…', 'connecting');
+        const [appModule, authModule, firestoreModule] = await Promise.all([
+          import('https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js'),
+          import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
+          import('https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js')
+        ]);
+        const app = appModule.initializeApp(window.FIREBASE_CONFIG);
+        const auth = authModule.getAuth(app);
+        await authModule.signInAnonymously(auth);
+        firebaseDb = firestoreModule.getFirestore(app);
+        firebaseApi = firestoreModule;
+        const localBackup = [...grievances];
+        let initialSnapshotHandled = false;
+        unsubscribeGrievanceSync = firestoreModule.onSnapshot(
+          firestoreModule.collection(firebaseDb, 'portals', 'mech-sec-d', 'grievances'),
+          async (snapshot) => {
+            if (!initialSnapshotHandled && snapshot.empty && localBackup.length) {
+              await Promise.all(localBackup.map((grievance) => firestoreModule.setDoc(
+                firestoreModule.doc(firebaseDb, 'portals', 'mech-sec-d', 'grievances', grievance.id), grievance
+              )));
+              initialSnapshotHandled = true;
+              return;
+            }
+            initialSnapshotHandled = true;
+            grievances = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }))
+              .sort((left, right) => new Date(right.submittedAt) - new Date(left.submittedAt));
+            saveStorage('edup_mechd_grievances_v11', grievances);
+            firebaseGrievanceSyncActive = true;
+            setFirebaseSyncStatus('Live sync', 'live');
+            refreshGrievanceUiFromCloud();
+          },
+          (error) => {
+            firebaseGrievanceSyncActive = false;
+            setFirebaseSyncStatus('Cloud sync unavailable', 'error');
+            console.error('Firebase grievance listener error:', error);
+          }
+        );
+      } catch (error) {
+        firebaseGrievanceSyncActive = false;
+        setFirebaseSyncStatus('Cloud sync unavailable', 'error');
+        console.error('Firebase setup error:', error);
+      }
+    }
+
+    function persistGrievance(grievance) {
+      saveStorage('edup_mechd_grievances_v11', grievances);
+      if (!firebaseGrievanceSyncActive || !firebaseDb || !firebaseApi) return;
+      firebaseApi.setDoc(firebaseApi.doc(firebaseDb, 'portals', 'mech-sec-d', 'grievances', grievance.id), grievance)
+        .catch((error) => {
+          setFirebaseSyncStatus('Cloud sync unavailable', 'error');
+          console.error('Firebase grievance write error:', error);
+          showToast('Saved on this device, but cloud sync could not update.', 'warning');
+        });
+    }
+
     let currentUser = loadStorage('edup_mechd_user_v11', null);
     let timetable = loadStorage('edup_mechd_timetable_v11', DEFAULT_TIMETABLE);
     let courseDetails = loadStorage('edup_mechd_courses_v11', DEFAULT_COURSE_DETAILS);
@@ -1529,6 +1671,23 @@
     let classOverrides = loadStorage('edup_mechd_overrides_v11', DEFAULT_OVERRIDES);
     let announcements = loadStorage('edup_mechd_announcements_v11', DEFAULT_ANNOUNCEMENTS);
     let grievances = loadStorage('edup_mechd_grievances_v11', DEFAULT_GRIEVANCES);
+    // Anonymous filing is no longer supported. Restore the submitter details already
+    // retained with older records, so existing cases follow the same policy.
+    grievances = grievances.map((grievance) => {
+      if (!grievance.isAnonymous) return grievance;
+      const student = studentList.find((item) => `student${item.roll}@portal.edu` === grievance.studentEmail);
+      return {
+        ...grievance,
+        studentName: student ? student.name : 'Student record unavailable',
+        studentRoll: student ? `#${student.roll}` : '—',
+        isAnonymous: false,
+        stream: grievance.stream || (student ? student.stream : null)
+      };
+    });
+    saveStorage('edup_mechd_grievances_v11', grievances);
+    let todos = [];
+    let editingTodoId = null;
+    let classReminderSettings = { enabled: false, leadMinutes: 10, notified: {} };
     let activeDayOrder = loadStorage('edup_mechd_global_day_v11', 'Day 5');
     
     let currentTab = 'timetableTab';
@@ -1602,6 +1761,8 @@
 
       calculateOngoingClassStatus(activeDayOrder, currentMins);
       checkTodayCancellationsForBanner(activeDayOrder);
+      renderClassTracker(currentMins);
+      checkClassReminders(currentMins);
     }
 
     // CR / FA Global Day Order Changer
@@ -1949,7 +2110,7 @@
       }
 
       currentTab = tabId;
-      ['timetableTab', 'courseDirectoryTab', 'studentManageTab', 'cancellationsTab', 'announcementsTab', 'grievanceTab'].forEach((id) => {
+      ['timetableTab', 'courseDirectoryTab', 'studentManageTab', 'cancellationsTab', 'announcementsTab', 'grievanceTab', 'todosTab'].forEach((id) => {
         const el = document.getElementById(id);
         const btn = document.getElementById(`tabBtn-${id.replace('Tab', '')}`);
         if (!el || !btn) return;
@@ -1968,6 +2129,7 @@
       if (tabId === 'cancellationsTab') renderCancellations();
       if (tabId === 'announcementsTab') renderAnnouncements();
       if (tabId === 'grievanceTab') renderGrievanceList();
+      if (tabId === 'todosTab') renderTodoList();
       lucide.createIcons();
     }
 
@@ -1978,6 +2140,9 @@
       const headerUserPanel = document.getElementById('headerUserPanel');
 
       if (!currentUser) {
+        todos = [];
+        editingTodoId = null;
+        classReminderSettings = { enabled: false, leadMinutes: 10, notified: {} };
         loginScreen.classList.remove('hidden');
         dashboardApp.classList.add('hidden');
         headerGuestIndicator.classList.remove('hidden');
@@ -1992,6 +2157,8 @@
       headerGuestIndicator.classList.add('hidden');
       headerUserPanel.classList.remove('hidden');
       headerUserPanel.classList.add('flex');
+      todos = loadTodosForCurrentUser();
+      classReminderSettings = loadClassReminderSettings();
 
       document.getElementById('headerUserName').textContent = currentUser.name;
       document.getElementById('headerUserRoleBadge').textContent = `${currentUser.role.toUpperCase()} (${currentUser.rollNo})`;
@@ -2021,7 +2188,7 @@
       } else if (currentUser.role === 'cr') {
         roleBadge.textContent = `Class Representative (CR Authority) • ${currentUser.stream}`;
         roleBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-emerald-500/30 text-emerald-300 border border-emerald-400/40";
-        document.getElementById('studentGrievanceSubmitCard').classList.remove('hidden');
+        document.getElementById('studentGrievanceSubmitCard').classList.add('hidden');
         studentManageBtn.classList.remove('hidden');
         studentManageBtn.classList.add('flex');
       } else if (currentUser.role === 'fa') {
@@ -2060,7 +2227,9 @@
       dayOrderSelect.value = activeDayOrder;
       document.getElementById('tabBadgeCancellations').textContent = classOverrides.length;
       document.getElementById('tabBadgeUpdates').textContent = announcements.length;
-      document.getElementById('tabBadgeGrievances').textContent = grievances.length;
+      document.getElementById('tabBadgeGrievances').textContent = grievances.filter(canViewGrievance).length;
+      updateTodoBadge();
+      checkTodoReminders();
       document.getElementById('tabBadgeStudentCount').textContent = studentList.length;
 
       populateCourseSelectOptions();
@@ -2895,7 +3064,334 @@
       showToast('Announcement removed.', 'info');
     }
 
-    // --- 14. GRIEVANCES CONTROLLER ---
+    // --- 14. CLASS TRACKER & CLASS-START REMINDERS ---
+    function getClassReminderStorageKey() {
+      return currentUser ? `edup_mechd_class_reminders_v11_${encodeURIComponent(currentUser.email)}` : null;
+    }
+
+    function loadClassReminderSettings() {
+      const key = getClassReminderStorageKey();
+      const stored = key ? loadStorage(key, null) : null;
+      return { enabled: false, leadMinutes: 10, notified: {}, ...(stored || {}) };
+    }
+
+    function saveClassReminderSettings() {
+      const key = getClassReminderStorageKey();
+      if (key) saveStorage(key, classReminderSettings);
+    }
+
+    function getIndianDateKey() {
+      const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+      const values = Object.fromEntries(parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]));
+      return `${values.year}-${values.month}-${values.day}`;
+    }
+
+    function getTodayClassTrackerSchedule() {
+      if (activeDayOrder === 'Holiday') return [];
+      const daySchedule = timetable.find((item) => item.day === activeDayOrder);
+      if (!daySchedule) return [];
+      return PERIOD_SLOTS.filter((slot) => Number.isInteger(slot.idx)).map((slot) => {
+        const override = getOverrideForSlot(activeDayOrder, slot.idx);
+        if (override && override.statusType === 'CANCELLED') return null;
+        const subject = override && override.statusType === 'SUBSTITUTE' ? override.substituteSubject : daySchedule.periods[slot.idx];
+        if (!subject || subject.trim() === '' || subject === '-') return null;
+        const course = getCourseInfo(subject);
+        return { slot, subject, courseName: course ? course.name : '', room: course ? course.room : 'Batch 2', substitute: Boolean(override && override.statusType === 'SUBSTITUTE') };
+      }).filter(Boolean);
+    }
+
+    function toggleClassTrackerDetails() {
+      const details = document.getElementById('classTrackerDetails');
+      const button = document.getElementById('classTrackerCompactBtn');
+      if (!details || !button) return;
+      const opening = details.classList.contains('hidden');
+      details.classList.toggle('hidden', !opening);
+      button.setAttribute('aria-label', opening ? 'Collapse class tracker' : 'Expand class tracker');
+      button.innerHTML = `<i data-lucide="${opening ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>`;
+      lucide.createIcons();
+    }
+
+    function updateClassReminderControls() {
+      const select = document.getElementById('classReminderLead');
+      const button = document.getElementById('classReminderToggle');
+      if (select) select.value = String(classReminderSettings.leadMinutes);
+      if (button) {
+        button.textContent = classReminderSettings.enabled ? 'Enabled' : 'Enable';
+        button.className = classReminderSettings.enabled
+          ? 'px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 transition cursor-pointer'
+          : 'px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-brand-200 bg-brand-50 text-brand-700 transition cursor-pointer';
+      }
+    }
+
+    function saveClassReminderLead() {
+      classReminderSettings.leadMinutes = Number(document.getElementById('classReminderLead').value);
+      classReminderSettings.notified = {};
+      saveClassReminderSettings();
+      showToast(`Class alerts set for ${classReminderSettings.leadMinutes} minutes before class.`, 'success');
+    }
+
+    function toggleClassReminders() {
+      const finish = (enabled) => {
+        classReminderSettings.enabled = enabled;
+        classReminderSettings.notified = {};
+        saveClassReminderSettings();
+        updateClassReminderControls();
+        showToast(enabled ? 'Class-start reminders enabled.' : 'Class-start reminders paused.', enabled ? 'success' : 'info');
+      };
+      if (classReminderSettings.enabled) return finish(false);
+      if (!('Notification' in window) || Notification.permission === 'granted') return finish(true);
+      if (Notification.permission === 'denied') {
+        finish(true);
+        showToast('Browser alerts are blocked, so reminders will appear inside the portal only.', 'warning');
+        return;
+      }
+      Notification.requestPermission().then((permission) => {
+        finish(true);
+        if (permission !== 'granted') showToast('Browser alerts were not enabled; reminders will appear inside the portal only.', 'warning');
+      });
+    }
+
+    function renderClassTracker(currentMins) {
+      const summary = document.getElementById('classTrackerSummary');
+      const subtext = document.getElementById('classTrackerSubtext');
+      const scheduleContainer = document.getElementById('classTrackerSchedule');
+      if (!summary || !subtext || !scheduleContainer) return;
+      const schedule = getTodayClassTrackerSchedule();
+      const current = schedule.find((item) => currentMins >= item.slot.start && currentMins < item.slot.end);
+      const next = schedule.find((item) => item.slot.start > currentMins);
+      if (activeDayOrder === 'Holiday') {
+        summary.textContent = 'Holiday — no classes scheduled';
+        subtext.textContent = 'Class alerts are paused for today';
+      } else if (current) {
+        summary.textContent = `Now: ${current.subject}`;
+        subtext.textContent = `${current.slot.label} • ${current.slot.timeStr} • ${current.room}`;
+      } else if (next) {
+        summary.textContent = `Next: ${next.subject}`;
+        subtext.textContent = `${next.slot.label} starts ${next.slot.timeStr.split(' - ')[0]} • ${next.room}`;
+      } else {
+        summary.textContent = schedule.length ? 'Classes are complete for today' : 'No classes scheduled today';
+        subtext.textContent = `${activeDayOrder} • Check the next Day Order later`;
+      }
+      scheduleContainer.innerHTML = schedule.length ? schedule.map((item) => `<div class="min-w-[124px] p-2 rounded-xl border ${current && current.slot.idx === item.slot.idx ? 'bg-brand-50 border-brand-200' : 'bg-white border-slate-200'}"><div class="text-[9px] font-bold text-slate-400">${item.slot.label}</div><div class="text-[11px] font-black text-slate-800 truncate">${escapeHtml(item.subject)}</div><div class="text-[9px] text-slate-500 mt-0.5">${item.slot.timeStr.split(' - ')[0]}</div></div>`).join('') : '<span class="text-[11px] text-slate-400">No class periods to track today.</span>';
+      updateClassReminderControls();
+      lucide.createIcons();
+    }
+
+    function checkClassReminders(currentMins) {
+      if (!currentUser || !classReminderSettings.enabled || activeDayOrder === 'Holiday') return;
+      const today = getIndianDateKey();
+      let changed = false;
+      getTodayClassTrackerSchedule().forEach((item) => {
+        const reminderStart = item.slot.start - classReminderSettings.leadMinutes;
+        const key = `${today}-${activeDayOrder}-${item.slot.idx}`;
+        if (currentMins < reminderStart || currentMins >= item.slot.start || classReminderSettings.notified[key]) return;
+        classReminderSettings.notified[key] = true;
+        changed = true;
+        const message = `${item.subject} starts at ${item.slot.timeStr.split(' - ')[0]} in ${classReminderSettings.leadMinutes} minutes.`;
+        showToast(`Class reminder: ${message}`, 'warning');
+        if ('Notification' in window && Notification.permission === 'granted') new Notification('Upcoming class', { body: message });
+      });
+      if (changed) saveClassReminderSettings();
+    }
+
+    // --- 15. PERSONAL TO-DO & REMINDER CONTROLLER ---
+    function getTodoStorageKey() {
+      return currentUser ? `edup_mechd_todos_v11_${encodeURIComponent(currentUser.email)}` : null;
+    }
+
+    function loadTodosForCurrentUser() {
+      const key = getTodoStorageKey();
+      return key ? loadStorage(key, []) : [];
+    }
+
+    function saveTodos() {
+      const key = getTodoStorageKey();
+      if (key) saveStorage(key, todos);
+    }
+
+    function updateTodoBadge() {
+      const badge = document.getElementById('tabBadgeTodos');
+      if (badge) badge.textContent = todos.filter((todo) => !todo.completed).length;
+    }
+
+    function formatTodoDueDate(dueAt) {
+      if (!dueAt) return 'No due date';
+      return new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true
+      }).format(new Date(dueAt));
+    }
+
+    function toLocalDateTimeInputValue(isoDate) {
+      if (!isoDate) return '';
+      const date = new Date(isoDate);
+      const offset = date.getTimezoneOffset();
+      return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 16);
+    }
+
+    function submitTodo(event) {
+      event.preventDefault();
+      if (!currentUser) return;
+      const title = document.getElementById('todoTitle').value.trim();
+      const notes = document.getElementById('todoNotes').value.trim();
+      const dueInput = document.getElementById('todoDueAt').value;
+      const reminderValue = document.getElementById('todoReminderMinutes').value;
+      const task = {
+        title,
+        notes,
+        dueAt: dueInput ? new Date(dueInput).toISOString() : null,
+        priority: document.getElementById('todoPriority').value,
+        reminderMinutes: reminderValue === '' ? null : Number(reminderValue),
+        remindedAt: null,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (editingTodoId) {
+        const index = todos.findIndex((todo) => todo.id === editingTodoId);
+        if (index === -1) return cancelTodoEdit();
+        const oldDueAt = todos[index].dueAt;
+        todos[index] = { ...todos[index], ...task, remindedAt: oldDueAt === task.dueAt ? todos[index].remindedAt : null };
+        showToast('To-do updated.', 'success');
+      } else {
+        todos.unshift({ id: `TODO-${Date.now().toString(36).toUpperCase()}`, completed: false, createdAt: new Date().toISOString(), ...task });
+        showToast('To-do added.', 'success');
+      }
+
+      saveTodos();
+      cancelTodoEdit();
+      renderTodoList();
+    }
+
+    function startEditTodo(id) {
+      const todo = todos.find((item) => item.id === id);
+      if (!todo) return;
+      editingTodoId = id;
+      document.getElementById('todoTitle').value = todo.title;
+      document.getElementById('todoNotes').value = todo.notes || '';
+      document.getElementById('todoDueAt').value = toLocalDateTimeInputValue(todo.dueAt);
+      document.getElementById('todoPriority').value = todo.priority || 'Medium';
+      document.getElementById('todoReminderMinutes').value = todo.reminderMinutes ?? '';
+      document.getElementById('todoFormHeading').textContent = 'Edit To-Do';
+      document.getElementById('todoSubmitBtn').textContent = 'Save Changes';
+      document.getElementById('cancelTodoEditBtn').classList.remove('hidden');
+      document.getElementById('todoTitle').focus();
+    }
+
+    function cancelTodoEdit() {
+      editingTodoId = null;
+      const form = document.getElementById('todoForm');
+      if (form) form.reset();
+      document.getElementById('todoFormHeading').textContent = 'Add a To-Do';
+      document.getElementById('todoSubmitBtn').textContent = 'Add To-Do';
+      document.getElementById('cancelTodoEditBtn').classList.add('hidden');
+    }
+
+    function toggleTodoCompleted(id) {
+      const todo = todos.find((item) => item.id === id);
+      if (!todo) return;
+      todo.completed = !todo.completed;
+      todo.updatedAt = new Date().toISOString();
+      saveTodos();
+      renderTodoList();
+    }
+
+    function deleteTodo(id) {
+      todos = todos.filter((todo) => todo.id !== id);
+      if (editingTodoId === id) cancelTodoEdit();
+      saveTodos();
+      renderTodoList();
+      showToast('To-do removed.', 'info');
+    }
+
+    function clearCompletedTodos() {
+      const completedCount = todos.filter((todo) => todo.completed).length;
+      if (!completedCount) return showToast('There are no completed to-dos to clear.', 'info');
+      todos = todos.filter((todo) => !todo.completed);
+      saveTodos();
+      renderTodoList();
+      showToast(`${completedCount} completed to-do${completedCount === 1 ? '' : 's'} cleared.`, 'info');
+    }
+
+    function renderTodoList() {
+      const container = document.getElementById('todoList');
+      if (!container) return;
+      const now = Date.now();
+      const orderedTodos = [...todos].sort((left, right) => {
+        if (left.completed !== right.completed) return Number(left.completed) - Number(right.completed);
+        return (left.dueAt ? new Date(left.dueAt).getTime() : Infinity) - (right.dueAt ? new Date(right.dueAt).getTime() : Infinity);
+      });
+      const openCount = todos.filter((todo) => !todo.completed).length;
+      document.getElementById('todoSummary').textContent = openCount ? `${openCount} active to-do${openCount === 1 ? '' : 's'}` : 'No active tasks';
+      updateTodoBadge();
+
+      if (!orderedTodos.length) {
+        container.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs">Your task list is clear. Add your first to-do on the left.</div>';
+        return;
+      }
+
+      const priorityStyles = { Low: 'bg-slate-100 text-slate-600', Medium: 'bg-amber-100 text-amber-800', High: 'bg-rose-100 text-rose-800' };
+      container.innerHTML = orderedTodos.map((todo) => {
+        const isOverdue = !todo.completed && todo.dueAt && new Date(todo.dueAt).getTime() < now;
+        const dueClass = isOverdue ? 'text-rose-600 font-bold' : 'text-slate-500';
+        return `<div class="flex items-start gap-2.5 p-3 rounded-2xl border ${todo.completed ? 'bg-slate-50 border-slate-200 opacity-70' : 'bg-white border-slate-200'}">
+          <button type="button" onclick="toggleTodoCompleted('${todo.id}')" aria-label="Mark ${todo.completed ? 'incomplete' : 'complete'}" class="mt-0.5 w-5 h-5 shrink-0 rounded-md border ${todo.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 text-transparent hover:border-brand-500'} flex items-center justify-center transition cursor-pointer"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+          <div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-2"><div class="text-xs font-bold text-slate-800 ${todo.completed ? 'line-through' : ''}">${escapeHtml(todo.title)}</div><span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-full ${priorityStyles[todo.priority] || priorityStyles.Medium}">${escapeHtml(todo.priority || 'Medium')}</span></div>${todo.notes ? `<p class="text-[11px] text-slate-500 mt-1 leading-relaxed">${escapeHtml(todo.notes)}</p>` : ''}<div class="mt-1.5 flex items-center gap-1.5 text-[10px] ${dueClass}"><i data-lucide="calendar-clock" class="w-3 h-3"></i><span>${todo.dueAt ? `${isOverdue ? 'Overdue: ' : 'Due: '}${formatTodoDueDate(todo.dueAt)}` : 'No due date'}</span></div></div>
+          <div class="flex gap-1 shrink-0"><button type="button" onclick="startEditTodo('${todo.id}')" class="p-1 text-slate-400 hover:text-brand-600 transition cursor-pointer" aria-label="Edit"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button><button type="button" onclick="deleteTodo('${todo.id}')" class="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" aria-label="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+        </div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function enableTodoNotifications() {
+      if (!('Notification' in window)) return showToast('Browser alerts are not supported here. In-portal reminders will still appear.', 'info');
+      if (Notification.permission === 'granted') return showToast('Browser alerts are already enabled.', 'success');
+      Notification.requestPermission().then((permission) => showToast(permission === 'granted' ? 'Browser alerts enabled.' : 'Browser alerts were not enabled; in-portal reminders will still appear.', permission === 'granted' ? 'success' : 'info'));
+    }
+
+    function checkTodoReminders() {
+      if (!currentUser || !todos.length) return;
+      const now = Date.now();
+      let changed = false;
+      todos.forEach((todo) => {
+        if (todo.completed || !todo.dueAt || todo.reminderMinutes === null || todo.reminderMinutes === undefined || todo.remindedAt) return;
+        const reminderAt = new Date(todo.dueAt).getTime() - todo.reminderMinutes * 60000;
+        if (now < reminderAt) return;
+        todo.remindedAt = new Date().toISOString();
+        changed = true;
+        showToast(`Reminder: ${todo.title}`, 'warning');
+        if ('Notification' in window && Notification.permission === 'granted') new Notification('Mech D Portal reminder', { body: todo.title });
+      });
+      if (changed) {
+        saveTodos();
+        if (currentTab === 'todosTab') renderTodoList();
+      }
+    }
+
+    // --- 15. GRIEVANCES CONTROLLER ---
+    function getGrievanceStream(grievance) {
+      if (grievance.stream) return grievance.stream;
+      const student = studentList.find((item) => `student${item.roll}@portal.edu` === grievance.studentEmail);
+      return student ? student.stream : null;
+    }
+
+    function canViewGrievance(grievance) {
+      if (!currentUser) return false;
+      if (currentUser.role === 'fa') return true;
+      if (currentUser.role === 'cr') return getGrievanceStream(grievance) === currentUser.stream;
+      return currentUser.role === 'student' && grievance.studentEmail === currentUser.email;
+    }
+
+    function canActOnGrievance(grievance, role) {
+      if (!currentUser || currentUser.role !== role || !canViewGrievance(grievance)) return false;
+      if (role === 'cr') return ['Submitted', 'Under Review by CR'].includes(grievance.status);
+      return ['Forwarded to FA', 'Under Investigation by FA'].includes(grievance.status);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      })[character]);
+    }
+
     function toggleGrievanceForm() {
       const form = document.getElementById('grievanceForm');
       const btn = document.getElementById('btnToggleGrievanceForm');
@@ -2912,22 +3408,26 @@
 
     function submitStudentGrievance(e) {
       e.preventDefault();
+      if (!currentUser || currentUser.role !== 'student') {
+        showToast('Only student accounts can lodge a grievance.', 'warning');
+        return;
+      }
       const category = document.getElementById('grvCategory').value;
       const severity = document.getElementById('grvSeverity').value;
       const title = document.getElementById('grvTitle').value.trim();
       const description = document.getElementById('grvDescription').value.trim();
-      const isAnonymous = document.getElementById('grvAnonymous').checked;
 
       const newGrievance = {
-        id: 'GRV-' + Math.floor(100 + Math.random() * 900),
+        id: `GRV-${Date.now().toString(36).toUpperCase()}`,
         title,
         category,
         severity,
         description,
         studentEmail: currentUser.email,
-        studentName: isAnonymous ? 'Anonymous Student' : currentUser.name,
-        studentRoll: isAnonymous ? 'Anonymous' : currentUser.rollNo,
-        isAnonymous,
+        studentName: currentUser.name,
+        studentRoll: currentUser.rollNo,
+        isAnonymous: false,
+        stream: currentUser.stream,
         status: 'Submitted',
         submittedAt: new Date().toISOString(),
         crRemark: '',
@@ -2937,11 +3437,11 @@
       };
 
       grievances.unshift(newGrievance);
-      saveStorage('edup_mechd_grievances_v11', grievances);
+      persistGrievance(newGrievance);
 
       document.getElementById('grievanceForm').reset();
       toggleGrievanceForm();
-      document.getElementById('tabBadgeGrievances').textContent = grievances.length;
+      document.getElementById('tabBadgeGrievances').textContent = grievances.filter(canViewGrievance).length;
       renderGrievanceList();
       showToast('Grievance registered and routed for CR review.', 'success');
     }
@@ -2951,12 +3451,13 @@
       const searchKey = document.getElementById('grvSearch').value.toLowerCase().trim();
       container.innerHTML = '';
 
-      document.getElementById('statTotalGrievances').textContent = grievances.length;
-      document.getElementById('statPendingGrievances').textContent = grievances.filter((g) => g.status === 'Submitted' || g.status === 'Under Review by CR').length;
-      document.getElementById('statForwardedGrievances').textContent = grievances.filter((g) => g.status === 'Forwarded to FA').length;
-      document.getElementById('statResolvedGrievances').textContent = grievances.filter((g) => g.status === 'Resolved' || g.status === 'Closed').length;
+      const visibleGrievances = grievances.filter(canViewGrievance);
+      document.getElementById('statTotalGrievances').textContent = visibleGrievances.length;
+      document.getElementById('statPendingGrievances').textContent = visibleGrievances.filter((g) => g.status === 'Submitted' || g.status === 'Under Review by CR' || g.status === 'Under Investigation by FA').length;
+      document.getElementById('statForwardedGrievances').textContent = visibleGrievances.filter((g) => g.status === 'Forwarded to FA').length;
+      document.getElementById('statResolvedGrievances').textContent = visibleGrievances.filter((g) => g.status === 'Resolved' || g.status === 'Closed').length;
 
-      const list = grievances.filter((g) => {
+      const list = visibleGrievances.filter((g) => {
         if (searchKey) {
           const m1 = g.title.toLowerCase().includes(searchKey);
           const m2 = g.description.toLowerCase().includes(searchKey);
@@ -2986,6 +3487,7 @@
         'Submitted': 'bg-blue-50 text-blue-700 border-blue-200',
         'Under Review by CR': 'bg-amber-50 text-amber-800 border-amber-200',
         'Forwarded to FA': 'bg-purple-50 text-purple-800 border-purple-200',
+        'Under Investigation by FA': 'bg-violet-50 text-violet-800 border-violet-200',
         'Resolved': 'bg-emerald-50 text-emerald-800 border-emerald-200',
         'Closed': 'bg-slate-100 text-slate-700 border-slate-300'
       };
@@ -3009,14 +3511,14 @@
       }).format(new Date(g.submittedAt));
 
       let actionButtons = '';
-      if (currentUser && currentUser.role === 'cr') {
+      if (canActOnGrievance(g, 'cr')) {
         actionButtons = `
           <button onclick="openActionModal('${g.id}', 'cr')" class="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-black text-white text-[11px] font-bold transition shadow-xs flex items-center gap-1 cursor-pointer">
             <i data-lucide="edit-3" class="w-3 h-3"></i>
             <span>Action</span>
           </button>
         `;
-      } else if (currentUser && currentUser.role === 'fa') {
+      } else if (canActOnGrievance(g, 'fa')) {
         actionButtons = `
           <button onclick="openActionModal('${g.id}', 'fa')" class="px-2.5 py-1 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold transition shadow-xs flex items-center gap-1 cursor-pointer">
             <i data-lucide="check-circle-2" class="w-3 h-3"></i>
@@ -3028,17 +3530,17 @@
       card.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div class="flex items-center gap-1.5 flex-wrap">
-            <span class="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">${g.id}</span>
+            <span class="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">${escapeHtml(g.id)}</span>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}">${g.status}</span>
             <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded-full ${sevBadge}">Sev: ${g.severity}</span>
-            <span class="text-[11px] text-slate-400 font-medium">• ${g.category}</span>
+            <span class="text-[11px] text-slate-400 font-medium">• ${escapeHtml(g.category)}</span>
           </div>
           <div>${actionButtons}</div>
         </div>
 
         <div>
-          <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">${g.title}</h4>
-          <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">${g.description}</p>
+          <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">${escapeHtml(g.title)}</h4>
+          <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">${escapeHtml(g.description)}</p>
         </div>
 
         ${(g.crRemark || g.faResolution) ? `
@@ -3046,21 +3548,21 @@
             ${g.crRemark ? `
               <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-2 text-amber-900 text-[11px]">
                 <span class="font-bold text-amber-800 block text-[10px]">CR Endorsement:</span>
-                <p class="text-slate-700">${g.crRemark}</p>
+                <p class="text-slate-700">${escapeHtml(g.crRemark)}</p>
               </div>
             ` : ''}
 
             ${g.faResolution ? `
               <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2 text-emerald-950 text-[11px]">
                 <span class="font-bold text-emerald-800 block text-[10px]">Official Faculty Resolution:</span>
-                <p class="text-slate-800 font-medium">${g.faResolution}</p>
+                <p class="text-slate-800 font-medium">${escapeHtml(g.faResolution)}</p>
               </div>
             ` : ''}
           </div>
         ` : ''}
 
         <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-100">
-          <div>By: <strong class="text-slate-600">${g.studentName}</strong> ${g.isAnonymous ? '<span class="bg-slate-100 text-slate-500 px-1 rounded text-[9px]">Masked</span>' : `(${g.studentRoll})`}</div>
+          <div>By: <strong class="text-slate-600">${escapeHtml(g.studentName)}</strong> (${escapeHtml(g.studentRoll)})</div>
           <div>${submittedTime} IST</div>
         </div>
       `;
@@ -3070,7 +3572,10 @@
 
     function openActionModal(grievanceId, role) {
       const g = grievances.find((item) => item.id === grievanceId);
-      if (!g) return;
+      if (!g || !canActOnGrievance(g, role)) {
+        showToast('You do not have permission to update this grievance at its current stage.', 'warning');
+        return;
+      }
 
       document.getElementById('modalGrvId').value = g.id;
       document.getElementById('modalGrievanceTitle').textContent = g.title;
@@ -3087,12 +3592,16 @@
         crFields.classList.remove('hidden');
         faFields.classList.add('hidden');
         document.getElementById('modalCrNote').value = g.crRemark || '';
+        document.getElementById('modalCrNote').disabled = false;
+        document.getElementById('modalFaNote').disabled = true;
       } else {
         roleBadge.textContent = "Faculty Adviser Formal Resolution Panel";
         roleBadge.className = "text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200";
         faFields.classList.remove('hidden');
         crFields.classList.add('hidden');
         document.getElementById('modalFaNote').value = g.faResolution || '';
+        document.getElementById('modalFaNote').disabled = false;
+        document.getElementById('modalCrNote').disabled = true;
       }
 
       const modal = document.getElementById('actionModal');
@@ -3112,6 +3621,11 @@
       const id = document.getElementById('modalGrvId').value;
       const gIndex = grievances.findIndex((item) => item.id === id);
       if (gIndex === -1) return;
+      if (!canActOnGrievance(grievances[gIndex], currentUser.role)) {
+        closeActionModal();
+        showToast('This grievance is no longer available for that action.', 'warning');
+        return;
+      }
 
       if (currentUser.role === 'cr') {
         const actionType = document.getElementById('modalCrActionType').value;
@@ -3122,7 +3636,7 @@
         } else if (actionType === 'cr_resolve') {
           grievances[gIndex].status = 'Resolved';
         } else {
-          grievances[gIndex].status = 'Under Review by CR';
+          grievances[gIndex].status = 'Under Investigation by FA';
         }
 
         grievances[gIndex].crRemark = note;
@@ -3146,15 +3660,18 @@
         showToast(`Official Faculty Resolution Order filed for ${id}`, 'success');
       }
 
-      saveStorage('edup_mechd_grievances_v11', grievances);
+      persistGrievance(grievances[gIndex]);
       closeActionModal();
+      document.getElementById('tabBadgeGrievances').textContent = grievances.filter(canViewGrievance).length;
       renderGrievanceList();
     }
 
     // --- 15. INITIALIZATION ---
     window.addEventListener('DOMContentLoaded', () => {
       refreshAppState();
+      initFirebaseGrievanceSync();
       setInterval(updateIndianStandardTime, 1000);
+      setInterval(checkTodoReminders, 30000);
       updateIndianStandardTime();
     });
   </script>
