@@ -205,7 +205,7 @@
         </form>
       </div>
 
-      <!-- 2. CR & FA STAFF LOGIN (GMAIL + PASS) -->
+      <!-- 2. CR & FA STAFF LOGIN (NAME SELECT + SHARED STAFF PIN) -->
       <div id="staffLoginFormWrap" class="hidden space-y-4">
         <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 space-y-1">
           <div class="font-black flex items-center gap-1.5 text-amber-800">
@@ -213,43 +213,35 @@
             <span>Authorized Management Accounts (CR &amp; FA)</span>
           </div>
           <p class="text-slate-600 text-[11px] leading-relaxed">
-            All 5 Class Representatives and Faculty Advisers log in here using Gmail and password.
+            Tap your name, then enter the shared Staff PIN to sign in.
           </p>
         </div>
 
         <form onsubmit="handleStaffLogin(event)" class="space-y-3">
           <div>
-            <label for="staffEmailInput" class="block text-xs font-bold text-slate-700 mb-1">Registered Gmail Address</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                <i data-lucide="mail" class="w-4 h-4"></i>
-              </span>
-              <input
-                type="email"
-                id="staffEmailInput"
-                placeholder="arvind.cr@gmail.com"
-                required
-                class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs font-medium"
-              />
-            </div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Select Your Name</label>
+            <div id="staffNameGrid" class="grid grid-cols-2 gap-2"></div>
+            <input type="hidden" id="staffSelectedEmail" />
           </div>
 
           <div>
-            <label for="staffPasswordInput" class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <label for="staffPinInput" class="block text-xs font-bold text-slate-700 mb-1">Shared Staff PIN</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                 <i data-lucide="lock" class="w-4 h-4"></i>
               </span>
               <input
                 type="password"
-                id="staffPasswordInput"
-                placeholder="••••••••"
+                id="staffPinInput"
+                maxlength="4"
+                inputmode="numeric"
+                placeholder="••••"
                 required
-                class="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs font-medium"
+                class="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-mono font-bold tracking-widest"
               />
               <button
                 type="button"
-                onclick="toggleStaffPasswordVisibility()"
+                onclick="toggleStaffPinVisibility()"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
               >
                 <i id="staffEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
@@ -270,30 +262,6 @@
             <i data-lucide="log-in" class="w-4 h-4"></i>
           </button>
         </form>
-
-        <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
-          <div class="font-bold text-slate-700">Quick Fill Accounts:</div>
-          <div class="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
-            <button type="button" onclick="fillStaffHelper('arvind.cr@gmail.com', 'cr009')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Arvind M R</span> (cr009)
-            </button>
-            <button type="button" onclick="fillStaffHelper('akash.cr@gmail.com', 'cr005')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Akash Roy</span> (cr005)
-            </button>
-            <button type="button" onclick="fillStaffHelper('abhijith.cr@gmail.com', 'cr238')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Abhijith V</span> (cr238)
-            </button>
-            <button type="button" onclick="fillStaffHelper('muneer.cr@gmail.com', 'cr204')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">M. Muneer</span> (cr204)
-            </button>
-            <button type="button" onclick="fillStaffHelper('rushali.cr@gmail.com', 'cr210')" class="text-left bg-slate-50 p-1 rounded border border-slate-200 hover:bg-slate-100 truncate">
-              <span class="font-bold text-slate-800">Rushali V</span> (cr210)
-            </button>
-            <button type="button" onclick="fillStaffHelper('fa@gmail.com', 'fa123')" class="text-left bg-purple-50 p-1 rounded border border-purple-200 hover:bg-purple-100 truncate">
-              <span class="font-bold text-purple-900">Faculty Adviser</span> (fa123)
-            </button>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -1303,10 +1271,12 @@
       { roll: '014', name: 'THEJUS MANOJ', stream: 'R&A' }
     ];
 
+    // --- SHARED STAFF PIN (single PIN for all CR & FA accounts) ---
+    const STAFF_SHARED_PIN = '1109';
+
     const STAFF_ACCOUNTS = {
       'abhijith.cr@gmail.com': {
         email: 'abhijith.cr@gmail.com',
-        password: 'cr238',
         name: 'Abhijith Variar (CR)',
         regNo: 'RA2611002010238',
         rollNo: '#238',
@@ -1316,7 +1286,6 @@
       },
       'akash.cr@gmail.com': {
         email: 'akash.cr@gmail.com',
-        password: 'cr005',
         name: 'Akash Roy (CR)',
         regNo: 'RA2611072010005',
         rollNo: '#005',
@@ -1326,7 +1295,6 @@
       },
       'arvind.cr@gmail.com': {
         email: 'arvind.cr@gmail.com',
-        password: 'cr009',
         name: 'Arvind Naraynan M R (CR)',
         regNo: 'RA2611072010009',
         rollNo: '#009',
@@ -1336,7 +1304,6 @@
       },
       'muneer.cr@gmail.com': {
         email: 'muneer.cr@gmail.com',
-        password: 'cr204',
         name: 'Mohammed Muneer (CR)',
         regNo: 'RA2611002010204',
         rollNo: '#204',
@@ -1346,7 +1313,6 @@
       },
       'rushali.cr@gmail.com': {
         email: 'rushali.cr@gmail.com',
-        password: 'cr210',
         name: 'Rushali Vardhan (CR)',
         regNo: 'RA2611002010210',
         rollNo: '#210',
@@ -1356,7 +1322,6 @@
       },
       'fa@gmail.com': {
         email: 'fa@gmail.com',
-        password: 'fa123',
         name: 'Dr. Faculty Adviser',
         regNo: 'FAC-MECH-D',
         rollNo: 'FA',
@@ -2017,9 +1982,41 @@
         btnStudent.className = "py-2.5 rounded-xl text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition";
         staffWrap.classList.remove('hidden');
         studentWrap.classList.add('hidden');
-        document.getElementById('staffEmailInput').focus();
+        renderStaffNameGrid();
       }
       lucide.createIcons();
+    }
+
+    // Renders the tappable name tiles for CR & FA login
+    function renderStaffNameGrid() {
+      const grid = document.getElementById('staffNameGrid');
+      if (!grid) return;
+      const selectedEmail = document.getElementById('staffSelectedEmail').value;
+      const accounts = Object.values(STAFF_ACCOUNTS);
+      grid.innerHTML = accounts.map(account => {
+        const isSelected = account.email === selectedEmail;
+        const isFa = account.role === 'fa';
+        const baseClasses = "flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl border text-center transition cursor-pointer";
+        const selectedClasses = isFa
+          ? "bg-purple-50 border-purple-400 ring-2 ring-purple-300"
+          : "bg-brand-50 border-brand-400 ring-2 ring-brand-300";
+        const idleClasses = "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50";
+        return `
+          <button type="button" data-email="${account.email}" onclick="selectStaffName('${account.email}')" class="${baseClasses} ${isSelected ? selectedClasses : idleClasses}">
+            <span class="text-xs font-bold text-slate-800 truncate w-full">${account.name.replace(' (CR)', '')}</span>
+            <span class="text-[9px] font-bold uppercase tracking-wide ${isFa ? 'text-purple-600' : 'text-brand-600'}">${account.rollNo}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function selectStaffName(email) {
+      document.getElementById('staffSelectedEmail').value = email;
+      renderStaffNameGrid();
+      document.getElementById('staffLoginError').classList.add('hidden');
+      const pinInput = document.getElementById('staffPinInput');
+      if (pinInput) pinInput.focus();
     }
 
     function handleStudentLogin(e) {
@@ -2063,33 +2060,34 @@
 
     function handleStaffLogin(e) {
       e.preventDefault();
-      const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
-      const pwd = document.getElementById('staffPasswordInput').value.trim();
+      const selectedEmail = document.getElementById('staffSelectedEmail').value;
+      const pin = document.getElementById('staffPinInput').value.trim();
       const errBox = document.getElementById('staffLoginError');
       const errText = document.getElementById('staffLoginErrorText');
 
       errBox.classList.add('hidden');
 
-      const staffAccount = STAFF_ACCOUNTS[email];
-      if (staffAccount && staffAccount.password === pwd) {
+      if (!selectedEmail) {
+        errText.textContent = 'Please select your name first.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      const staffAccount = STAFF_ACCOUNTS[selectedEmail];
+      if (staffAccount && pin === STAFF_SHARED_PIN) {
         currentUser = { ...staffAccount, loggedInAt: new Date().toISOString() };
         saveStorage('edup_mechd_user_v11', currentUser);
         showToast(`Signed in: ${currentUser.name}`, 'success');
         refreshAppState();
       } else {
-        errText.textContent = 'Invalid Username or password entered.';
+        errText.textContent = 'Incorrect Staff PIN entered.';
         errBox.classList.remove('hidden');
       }
     }
 
-    function fillStaffHelper(email, pwd) {
-      document.getElementById('staffEmailInput').value = email;
-      document.getElementById('staffPasswordInput').value = pwd;
-    }
-
-    function toggleStaffPasswordVisibility() {
-      const pwd = document.getElementById('staffPasswordInput');
-      pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    function toggleStaffPinVisibility() {
+      const pin = document.getElementById('staffPinInput');
+      pin.type = pin.type === 'password' ? 'text' : 'password';
     }
 
     function logoutUser() {
@@ -2387,7 +2385,7 @@
           </td>
           <td class="py-2.5 px-3 font-mono text-[11px] text-slate-500">
             ${entry.isCr
-              ? `Gmail + password (CR &amp; FA Login)`
+              ? `Name + shared Staff PIN (CR &amp; FA Login)`
               : `Roll: <strong class="text-slate-800">${entry.roll}</strong> (No password required)`}
           </td>
           <td class="py-2.5 px-3 text-right">
