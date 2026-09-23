@@ -20,19 +20,17 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-    <!-- Background glowing decorative elements -->
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Main Container -->
-    <div class="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl text-center relative z-10">
+    <div class="max-w-md w-full bg-slate-900/85 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl text-center relative z-10">
         
-        <!-- Icon -->
+        <!-- Animated Icon -->
         <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl mb-6 floating-icon shadow-inner">
             <i class="fa-solid fa-gears text-3xl"></i>
         </div>
 
-        <!-- Heading -->
+        <!-- Heading & Description -->
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-3">We are updating our site</h1>
         <p class="text-slate-400 text-sm sm:text-base mb-8">
             We are currently performing scheduled maintenance and updates to bring you a better experience. We'll be back shortly!
@@ -56,28 +54,18 @@
                 <input type="email" id="email-input" placeholder="Enter your email" required
                     class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
                 <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-colors shadow-lg shadow-indigo-600/35">
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-colors shadow-lg shadow-indigo-600/35 cursor-pointer">
                     Notify Me
                 </button>
             </form>
             <p id="success-message" class="text-xs text-emerald-400 hidden mt-2">Thank you! We'll notify you when we launch.</p>
         </div>
 
-        <!-- Social Links / Footer -->
-        <div class="mt-8 pt-6 border-t border-slate-800/80 flex items-center justify-center gap-4 text-slate-400">
-            <a href="#" class="w-9 h-9 rounded-full bg-slate-800/50 hover:bg-slate-800 hover:text-indigo-400 flex items-center justify-center transition-colors">
-                <i class="fa-brands fa-twitter text-sm"></i>
-            </a>
-            <a href="#" class="w-9 h-9 rounded-full bg-slate-800/50 hover:bg-slate-800 hover:text-indigo-400 flex items-center justify-center transition-colors">
-                <i class="fa-brands fa-github text-sm"></i>
-            </a>
-            <a href="#" class="w-9 h-9 rounded-full bg-slate-800/50 hover:bg-slate-800 hover:text-indigo-400 flex items-center justify-center transition-colors">
-                <i class="fa-brands fa-discord text-sm"></i>
-            </a>
+        <div class="mt-8 pt-6 border-t border-slate-800/80 flex items-center justify-center text-xs text-slate-500 tracking-wide">
+            Designed & Maintained by <span class="text-indigo-400 font-semibold ml-1.5">Arvind (CR)</span>
         </div>
     </div>
 
-    <!-- Script for handling notify form -->
     <script>
         function handleNotify(event) {
             event.preventDefault();
