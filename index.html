@@ -1582,6 +1582,7 @@
     let firebaseApi = null;
     let unsubscribePortalSettingsSync = null;
     let unsubscribeStudentSync = null;
+    let unsubscribeStaffAccountSync = null;
     let unsubscribeCourseSync = null;
     let unsubscribeCancellationSync = null;
     let unsubscribeAnnouncementSync = null;
@@ -1591,6 +1592,7 @@
 
     let firebasePortalSyncActive = false;
     let firebaseStudentSyncActive = false;
+    let firebaseStaffAccountSyncActive = false;
     let firebaseCourseSyncActive = false;
     let firebaseCancellationSyncActive = false;
     let firebaseAnnouncementSyncActive = false;
@@ -1620,6 +1622,7 @@
       if (
         firebasePortalSyncActive ||
         firebaseStudentSyncActive ||
+        firebaseStaffAccountSyncActive ||
         firebaseCourseSyncActive ||
         firebaseCancellationSyncActive ||
         firebaseAnnouncementSyncActive ||
@@ -1636,6 +1639,9 @@
     }
     function getStudentsCollectionRef() {
       return firebaseApi.collection(firebaseDb, 'portals', 'mech-sec-d', 'students');
+    }
+    function getStaffAccountsCollectionRef() {
+      return firebaseApi.collection(firebaseDb, 'portals', 'mech-sec-d', 'staffAccounts');
     }
     function getCoursesCollectionRef() {
       return firebaseApi.collection(firebaseDb, 'portals', 'mech-sec-d', 'courses');
@@ -1699,11 +1705,30 @@
     function persistStudent(student) {
       saveStorage('edup_mechd_students_v11', studentList);
       if (!firebaseStudentSyncActive || !firebaseDb || !firebaseApi) return;
-      firebaseApi.setDoc(firebaseApi.doc(getStudentsCollectionRef(), student.roll), student)
+      firebaseApi.setDoc(firebaseApi.doc(getStudentsCollectionRef(), student.roll), { ...student, role: 'student', loginEnabled: true, loginEmail: `student${student.roll}@portal.edu` })
         .catch((error) => {
           console.error('Firebase student write error:', error);
           setFirebaseSyncStatus('Cloud sync unavailable', 'error');
           showToast('Student saved here, but shared roster could not be updated.', 'warning');
+        });
+    }
+
+    function refreshStaffAccountIndex() {
+      const nextCrRolls = Object.values(STAFF_ACCOUNTS)
+        .filter((account) => account.role === 'cr')
+        .map((account) => String(account.rollNo || '').replace('#', '').padStart(3, '0'));
+      CR_ROLLS.splice(0, CR_ROLLS.length, ...nextCrRolls);
+      saveStorage('edup_mechd_staff_accounts_v11', STAFF_ACCOUNTS);
+    }
+
+    function persistStaffAccount(account) {
+      refreshStaffAccountIndex();
+      if (!firebaseStaffAccountSyncActive || !firebaseDb || !firebaseApi) return;
+      firebaseApi.setDoc(firebaseApi.doc(getStaffAccountsCollectionRef(), encodeURIComponent(account.email)), account, { merge: true })
+        .catch((error) => {
+          console.error('Firebase staff account write error:', error);
+          setFirebaseSyncStatus('Cloud sync unavailable', 'error');
+          showToast('Staff account saved here, but shared staff directory could not be updated.', 'warning');
         });
     }
 
@@ -1941,15 +1966,36 @@
         let studentsInitialHandled = false;
         unsubscribeStudentSync = firestoreModule.onSnapshot(getStudentsCollectionRef(), async (snapshot) => {
           if (!studentsInitialHandled && snapshot.empty && localStudents.length) {
-            await Promise.all(localStudents.map((student) => firestoreModule.setDoc(firestoreModule.doc(getStudentsCollectionRef(), student.roll), student)));
+            await Promise.all(localStudents.map((student) => firestoreModule.setDoc(
+              firestoreModule.doc(getStudentsCollectionRef(), student.roll),
+              { ...student, role: 'student', loginEnabled: true, loginEmail: `student${student.roll}@portal.edu` }
+            )));
             studentsInitialHandled = true;
             firebaseStudentSyncActive = true;
             markFirebaseLiveIfReady();
             return;
           }
           studentsInitialHandled = true;
-          studentList = snapshot.docs.map((document) => ({ roll: document.id, ...document.data() }))
-            .sort((a, b) => a.roll.localeCompare(b.roll));
+          const missingLoginFields = [];
+          studentList = snapshot.docs.map((document) => {
+            const data = document.data();
+            const normalized = {
+              roll: document.id,
+              ...data,
+              role: 'student',
+              loginEnabled: data.loginEnabled !== false,
+              loginEmail: data.loginEmail || `student${document.id}@portal.edu`
+            };
+            if (!data.loginEmail || data.role !== 'student' || data.loginEnabled === undefined) missingLoginFields.push(normalized);
+            return normalized;
+          }).sort((a, b) => a.roll.localeCompare(b.roll));
+          if (missingLoginFields.length) {
+            await Promise.all(missingLoginFields.map((student) => firestoreModule.setDoc(
+              firestoreModule.doc(getStudentsCollectionRef(), student.roll),
+              { ...student, updatedAt: new Date().toISOString() },
+              { merge: true }
+            )));
+          }
           saveStorage('edup_mechd_students_v11', studentList);
           firebaseStudentSyncActive = true;
           markFirebaseLiveIfReady();
@@ -1957,6 +2003,59 @@
         }, (error) => {
           firebaseStudentSyncActive = false;
           console.error('Firebase student listener error:', error);
+          setFirebaseSyncStatus('Cloud sync unavailable', 'error');
+        });
+
+        // Shared CR / FA login directory. This is deliberately asynchronous: the
+        // portal uses the locally cached account list immediately, then refreshes it
+        // from Firebase in the background so login speed is not dependent on Firestore.
+        const cachedStaffAccounts = loadStorage('edup_mechd_staff_accounts_v11', null);
+        if (cachedStaffAccounts && typeof cachedStaffAccounts === 'object') {
+          Object.keys(STAFF_ACCOUNTS).forEach((email) => delete STAFF_ACCOUNTS[email]);
+          Object.assign(STAFF_ACCOUNTS, cachedStaffAccounts);
+          refreshStaffAccountIndex();
+          renderStaffNameGrid();
+        }
+
+        const localStaffAccounts = Object.values(STAFF_ACCOUNTS);
+        let staffAccountsInitialHandled = false;
+        unsubscribeStaffAccountSync = firestoreModule.onSnapshot(getStaffAccountsCollectionRef(), async (snapshot) => {
+          if (!staffAccountsInitialHandled && snapshot.empty && localStaffAccounts.length) {
+            await Promise.all(localStaffAccounts.map((account) => firestoreModule.setDoc(
+              firestoreModule.doc(getStaffAccountsCollectionRef(), encodeURIComponent(account.email)),
+              account
+            )));
+            staffAccountsInitialHandled = true;
+            firebaseStaffAccountSyncActive = true;
+            markFirebaseLiveIfReady();
+            return;
+          }
+          staffAccountsInitialHandled = true;
+          const cloudAccounts = {};
+          snapshot.docs.forEach((document) => {
+            const account = document.data() || {};
+            if (account.email) cloudAccounts[account.email] = account;
+          });
+          if (Object.keys(cloudAccounts).length) {
+            Object.keys(STAFF_ACCOUNTS).forEach((email) => delete STAFF_ACCOUNTS[email]);
+            Object.assign(STAFF_ACCOUNTS, cloudAccounts);
+            refreshStaffAccountIndex();
+            renderStaffNameGrid();
+            if (currentUser?.role === 'cr' || currentUser?.role === 'fa') {
+              const refreshed = STAFF_ACCOUNTS[currentUser.email];
+              if (refreshed) {
+                currentUser = { ...currentUser, ...refreshed };
+                saveStorage('edup_mechd_user_v11', currentUser);
+                document.getElementById('headerUserName').textContent = currentUser.name;
+              }
+            }
+            refreshAllCloudUi();
+          }
+          firebaseStaffAccountSyncActive = true;
+          markFirebaseLiveIfReady();
+        }, (error) => {
+          firebaseStaffAccountSyncActive = false;
+          console.error('Firebase staff account listener error:', error);
           setFirebaseSyncStatus('Cloud sync unavailable', 'error');
         });
 
@@ -2058,6 +2157,7 @@
       } catch (error) {
         firebasePortalSyncActive = false;
         firebaseStudentSyncActive = false;
+        firebaseStaffAccountSyncActive = false;
         firebaseCourseSyncActive = false;
         firebaseCancellationSyncActive = false;
         firebaseAnnouncementSyncActive = false;
@@ -2076,6 +2176,13 @@
         periods: Array.from({ length: 12 }, (_, index) => row?.periods?.[index] || '-')
       }));
     }
+
+    const cachedStaffAccountsAtBoot = loadStorage('edup_mechd_staff_accounts_v11', null);
+    if (cachedStaffAccountsAtBoot && typeof cachedStaffAccountsAtBoot === 'object') {
+      Object.keys(STAFF_ACCOUNTS).forEach((email) => delete STAFF_ACCOUNTS[email]);
+      Object.assign(STAFF_ACCOUNTS, cachedStaffAccountsAtBoot);
+    }
+    refreshStaffAccountIndex();
 
     let currentUser = loadStorage('edup_mechd_user_v11', null);
     let timetable = normalizeTimetableRows(loadStorage('edup_mechd_timetable_v11', DEFAULT_TIMETABLE));
@@ -2485,7 +2592,7 @@
       }
 
       // Check student list including newly registered students
-      const match = studentList.find(m => m.roll === rollNum);
+      const match = studentList.find(m => m.roll === rollNum && m.loginEnabled !== false);
 
       if (!match) {
         errEl.textContent = 'Roll number not found in Section D records. Contact your Class Representative to register your profile.';
@@ -2494,7 +2601,7 @@
       }
 
       currentUser = {
-        email: `student${rollNum}@portal.edu`,
+        email: match.loginEmail || `student${rollNum}@portal.edu`,
         name: match.name,
         rollNo: `#${match.roll}`,
         stream: match.stream,
@@ -2724,7 +2831,7 @@
         return;
       }
 
-      const newStudent = { roll, name, stream };
+      const newStudent = { roll, name, stream, role: 'student', loginEnabled: true, loginEmail: `student${roll}@portal.edu` };
       studentList.unshift(newStudent);
       persistStudent(newStudent);
 
